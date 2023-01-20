@@ -9,6 +9,6 @@ Front-end team:
 Lindsey Seay 
 ?
 
-Project Name:
+Project Name: TenWords
 
 Project Description:
