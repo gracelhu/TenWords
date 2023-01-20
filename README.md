@@ -7,7 +7,7 @@ Aayesha Islam
 
 Front-end team:
 Lindsey Seay 
-?
+Olivia Bronstein
 
 Project Name: TenWords
 
