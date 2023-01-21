@@ -1,14 +1,6 @@
-# introtoSWE
-Group project for introduction to software engineering 
+- The purpose of the "back end small scale project" branch is to get the back-end team comfortable using Go and APIs (as most are beginners). 
+- We decided to keep this seperated from the main branch because our team will eventually combine "front end small scale project" branch and "back end small scale project" branch when we're comfortable using the tools.
+- The APIs we decide to use are unknown at this point in time but they will be updated as we make changes to this branch. 
 
-Back-end team:
-Grace Hu,
-Aayesha Islam
-
-Front-end team:
-Lindsey Seay, 
-Olivia Bronstein
-
-Project Name: TenWords
-
-Project Description:  TenWords is a language-learning web application that allows users to quickly learn a language with just 10 words a day. After creating an account, users will be able to select a language that would like to learn. Initially, our application will only allow users to learn Spanish. However, in the future, this will include other languages as well. Each day, users will receive an email notifying them that 10 words for the day have been posted. On our website, users will be able to learn the 10 words in the language through flashcards and quizzes. The flashcards will include text to speech options, so users can hear the pronunication of the words.
+Here's a link to the back-end team's design doc:
+https://docs.google.com/document/d/1DUmltvHkWgZ3KT_BtNKNyER4wdNewYedhoPkero4gKc/edit
