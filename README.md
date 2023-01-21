@@ -1,14 +1,7 @@
-# introtoSWE
-Group project for introduction to software engineering 
+- The purpose of the "front end small scale project" branch is to get the front-end team comfortable using Angular and UI components (as most are beginners). 
+- We decided to keep this seperated from the main branch because our team will eventually combine "front end small scale project" branch and "back end small scale project" branch when we're comfortable using the tools.
+- They will work with dummy data they create themselves that requires no APIs.
+- This dummy data will most likely be a text file with foreign vocabulary words along with their translation + definition + use case in a sentence.
+- On a timeline of 3-4 weeks, they will build a simple Angular application that builds the baseline for how the user will interact with TenWords.
+- There will be bundles of 10 flashcards that can turn over front and back labeled by their date.
 
-Back-end team:
-Grace Hu,
-Aayesha Islam
-
-Front-end team:
-Lindsey Seay, 
-Olivia Bronstein
-
-Project Name: TenWords
-
-Project Description:  TenWords is a language-learning web application that allows users to quickly learn a language with just 10 words a day. After creating an account, users will be able to select a language that would like to learn. Initially, our application will only allow users to learn Spanish. However, in the future, this will include other languages as well. Each day, users will receive an email notifying them that 10 words for the day have been posted. On our website, users will be able to learn the 10 words in the language through flashcards and quizzes. The flashcards will include text to speech options, so users can hear the pronunication of the words.
