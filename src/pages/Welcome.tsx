@@ -5,7 +5,7 @@ export default function Welcome() {
     return (
         <PageTemplate>
             <h1>TenWords</h1>
-            <p>Learn a language with just <b>ten</b> words a day.</p>
+            <p>TenWords is an application that allows you to learn a language with just <b>ten</b> words a day.</p>
         </PageTemplate>
     );
 }
