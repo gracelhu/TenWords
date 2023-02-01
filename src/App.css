@@ -40,3 +40,12 @@ body {
     transform: rotate(360deg);
   }
 }
+
+.Auth-form-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 100vw;
+  height: 20vh;
+}
