@@ -1,17 +1,23 @@
 //A functional CRUD RESTFUL API for TenWords application
-//Test and make API calls with Postman 
 
 package main
 
 import (
+	"bufio"
 	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
+	"os"
+	"strconv"
+	"time"
 
 	"github.com/gorilla/mux"
 )
 
-var allWords []Word //stores all words
+var allWords []Word              //stores all words
+var allPackages []TenWordPackage //stores all the ten word packages created
+var currentTime = time.Now()     //to get current date and time
 
 type Word struct {
 	ID              string `json:"id"`
@@ -21,16 +27,51 @@ type Word struct {
 	Examplesentence string `json:"examplesentence"`
 }
 
-// fetching two words for now to make it easier to test, will fetch 10 words later
-type TwoWordPackage struct {
+type TenWordPackage struct {
 	Tenwords []Word `json:"tenwords"`
-	Date     string `json:"date"`
+	Date     string `json:"date"` //in this format: 01-02-2006
 }
 
-// Get All Books
+// for small scale testing
+type TwoWordPackage struct {
+	Tenwords []Word `json:"twowords"`
+	Date     string `json:"date"` //in this format: 01-02-2006
+}
+
 func getAllWords(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(allWords)
+}
+
+func getTenWordsByID(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	params := mux.Vars(r)
+
+	//Loop through the words and find the one with the correct id
+	//the correct id for ten word packets: scalar * 10 + 1 --> 1, 11, 21, 31, 41, etc.
+	//the correct id for two word packets: scalar * 10 + 1 --> 1, 3, 5, 7, etc.
+
+	for index, item := range allWords {
+		if item.ID == params["id"] {
+			var tenWords = TenWordPackage{allWords[index : index+10], currentTime.Format("01-02-2006")}
+			allPackages = append(allPackages, tenWords)
+			json.NewEncoder(w).Encode(tenWords)
+			return
+		}
+	}
+}
+
+func getTenWordsByDate(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	params := mux.Vars(r)
+
+	//Loop through the allPackages slice and find the one with the correct date
+	for _, item := range allPackages {
+		if item.Date == params["date"] {
+			json.NewEncoder(w).Encode(item)
+			return
+		}
+	}
 }
 
 // for small scale testing
@@ -44,24 +85,7 @@ func getTwoWords(w http.ResponseWriter, r *http.Request) {
 
 	for index, item := range allWords {
 		if item.ID == params["id"] {
-			var twoWords = TwoWordPackage{allWords[index : index+2], "1/27/23"}
-			json.NewEncoder(w).Encode(twoWords)
-			return
-		}
-	}
-}
-
-func getTenWords(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
-	params := mux.Vars(r)
-
-	//Loop through the words and find the one with the correct id
-	//the correct id for ten word packets: scalar * 10 + 1 --> 1, 11, 21, 31, 41, etc.
-	//the correct id for two word packets: scalar * 10 + 1 --> 1, 3, 5, 7, etc.
-
-	for index, item := range allWords {
-		if item.ID == params["id"] {
-			var twoWords = TwoWordPackage{allWords[index : index+10], "1/27/23"}
+			var twoWords = TwoWordPackage{allWords[index : index+2], currentTime.Format("01-02-2006")}
 			json.NewEncoder(w).Encode(twoWords)
 			return
 		}
@@ -86,22 +110,28 @@ func main() {
 	//Init Router
 	r := mux.NewRouter()
 
-	//Mock Data - @todo - implement DB
-	allWords = append(allWords, Word{ID: "1", Word: "hello"})
-	allWords = append(allWords, Word{ID: "2", Word: "apple"})
-	allWords = append(allWords, Word{ID: "3", Word: "bye"})
-	allWords = append(allWords, Word{ID: "4", Word: "how"})
-	allWords = append(allWords, Word{ID: "5", Word: "blue"})
-	allWords = append(allWords, Word{ID: "6", Word: "red"})
-	allWords = append(allWords, Word{ID: "7", Word: "eyes"})
-	allWords = append(allWords, Word{ID: "8", Word: "nose"})
-	allWords = append(allWords, Word{ID: "9", Word: "running"})
-	allWords = append(allWords, Word{ID: "10", Word: "awesome"})
+	//@todo - implement DB
+	//Take all words from wordlist.txt and put them in allWords slice
+	readFile, err := os.Open("wordlist.txt")
+
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	fileScanner := bufio.NewScanner(readFile)
+
+	fileScanner.Split(bufio.ScanLines)
+
+	index := 1
+	for fileScanner.Scan() {
+		allWords = append(allWords, Word{ID: strconv.Itoa(index), Word: fileScanner.Text()})
+		index++
+	}
 
 	//Route Handlers
 	r.HandleFunc("/api/words", getAllWords).Methods("GET")
-	r.HandleFunc("/api/words/package/{id}", getTenWords).Methods("GET")
+	r.HandleFunc("/api/words/package/id/{id}", getTenWordsByID).Methods("GET")
 	r.HandleFunc("/api/words/single/{id}", getWord).Methods("GET")
-
+	r.HandleFunc("/api/words/package/date/{date}", getTenWordsByDate).Methods("GET")
 	log.Fatal(http.ListenAndServe(":8000", r))
 }
