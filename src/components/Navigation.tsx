@@ -28,9 +28,9 @@ export default function Navigation() {
     return (
         <>
             <AppBar color="secondary" position="static">
-                <Toolbar>
+                <Toolbar sx={{ margin: 'auto' }}>
                     {routes.map(route => (<><Button href={route.path} color="inherit">{route.name}</Button><Box sx={{m: 4}}/></>))}
-                    <Box sx={{mr: 50}}></Box>
+                    <Box sx={{mr: -10}}></Box>
                 </Toolbar>
             </AppBar>
         </>

@@ -4,8 +4,8 @@ import PageTemplate from '../pages/PageTemplate';
 export default function Words() {
     return (
         <PageTemplate>
-            <h1>Your Words</h1>
-            <p>Table of words will go here.</p>
+            <h1 style={{textAlign: "center"}}>Your Words</h1>
+            <p style={{textAlign: "center"}}>Table of words will go here.</p>
         </PageTemplate>
     );
 }

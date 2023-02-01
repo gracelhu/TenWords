@@ -4,7 +4,7 @@ import PageTemplate from '../pages/PageTemplate';
 export default function SignIn() {
     return (
         <PageTemplate>
-            <h1>Sign In</h1>
+            <h1 style={{textAlign: "center"}}>Sign In</h1>
         </PageTemplate>
     );
 }
