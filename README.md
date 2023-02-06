@@ -6,8 +6,7 @@ Grace Hu
 ?
 
 Front-end team:
-Lindsey Seay 
-?
+Lindsey Seay, Olivia Bronstein
 
 Project Name:
 
