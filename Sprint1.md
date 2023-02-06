@@ -1,4 +1,4 @@
-Frontend Branch for Sprint1 Worked In the Frontend Branch: (https://github.com/gracelhu/introtoSWE/tree/frontend)
+Frontend Branch for Sprint1 Worked In the "Frontend" Branch: (https://github.com/gracelhu/introtoSWE/tree/frontend)
 
 **User stories**
 
