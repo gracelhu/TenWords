@@ -20,7 +20,7 @@ As someone looking to keep their brain active and engaged in their downtime, the
 - Create page navigation (home page, words page, login page, signup page)
 - Implement word packet + word cards & list (currently use dummy data)
 - Create word card structure
-- 
+
  **Back end**
 
 - Building a REST API in golang
@@ -30,7 +30,9 @@ As someone looking to keep their brain active and engaged in their downtime, the
 - Creating persistence database using PostgreSQL
 
 **Which ones were successfully completed**
+
 **Front end**
+
 All issues were completed successfully.
 
 **Back end**
@@ -42,7 +44,10 @@ All issues were completed successfully.
 **Which ones didn't and why?**
 
 **Front end**
+
 N/A
+
 **Back end**
+
 - Creating persistence database using PostgreSQL
 
