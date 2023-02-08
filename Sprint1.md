@@ -20,8 +20,9 @@ As someone looking to keep their brain active and engaged in their downtime, the
 - Create page navigation (home page, words page, login page, signup page)
 - Implement word packet + word cards & list (currently use dummy data)
 - Create word card structure
+- 
  **Back end**
- - 
+
 - Building a REST API in golang
 - Writing Route Handler functions and testing server with Postman
 - create scrambled list of k-12 vocabulary words
@@ -31,6 +32,7 @@ As someone looking to keep their brain active and engaged in their downtime, the
 **Which ones were successfully completed**
 **Front end**
 All issues were completed successfully.
+
 **Back end**
 - Building a REST API in golang
 - Writing Route Handler functions and testing server with Postman
