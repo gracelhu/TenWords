@@ -1,6 +1,7 @@
 **Frontend Branch for Sprint1 Worked In the "Frontend" Branch:** (https://github.com/gracelhu/introtoSWE/tree/frontend)
 
 **User stories**
+
 As a foreign exchange student, the user can utilize the product to learn practical words of a new language at an effective pace to adapt their speaking skills to their new environment.
 
 As someone who is passionate about their own heritage and connecting to people from their ancestral origin, the user can use the product daily to keep in touch with their native language and practice efficiently.
@@ -15,7 +16,9 @@ As someone looking to keep their brain active and engaged in their downtime, the
 
 
 **What issues your team planned to address**
+
 **Front end**
+
 - Implement boilerplate React code
 - Create page navigation (home page, words page, login page, signup page)
 - Implement word packet + word cards & list (currently use dummy data)
