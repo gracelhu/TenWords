@@ -1,4 +1,15 @@
-//A functional CRUD RESTFUL API for TenWords application
+/*
+	- A functional CRUD RESTFUL API for TenWords application
+	- This API fetches ten word packages from a text file called "wordlist.txt" and uses
+	  golang googletrans library to translate the words into 6 different foreign languages:
+	  spanish, french, russian, italian, japanese, and chinese.
+	- Every time a ten word package is fetched, the date that package was fetched is recorded and
+	  stored in our database
+	- Additionally, it stores the language learning progress of users in a database by recording
+	  what index in wordlist.txt the user left off on.
+	- This API also autogenerates example sentences for each vocabulary word by calling a repository
+	  of millions of english sentences stored in a database
+*/
 
 package main
 
@@ -12,28 +23,30 @@ import (
 	"strconv"
 	"time"
 
+	translator "github.com/Conight/go-googletrans"
 	"github.com/gorilla/mux"
 )
 
 var allWords []Word              //stores all words
 var allPackages []TenWordPackage //stores all the ten word packages created
 var currentTime = time.Now()     //to get current date and time
+var t = translator.New()         //Init translator
 
+// Our application lets users learn these languages: spanish, french, russian, italian, japanese, chinese (simplified)
 type Word struct {
 	ID              string `json:"id"`
-	Word            string `json:"word"`
-	Spanish         string `json:"spanish"`
+	Word            string `json:"english"`  //en
+	Spanish         string `json:"spanish"`  //es
+	French          string `json:"french"`   //fr
+	Russian         string `json:"russian"`  //ru
+	Italian         string `json:"italian"`  //it
+	Japanese        string `json:"japanese"` //ja
+	Chinese         string `json:"chinese"`  //zh-cn
 	Examplesentence string `json:"examplesentence"`
 }
 
 type TenWordPackage struct {
 	Tenwords []Word `json:"tenwords"`
-	Date     string `json:"date"` //in this format: 01-02-2006
-}
-
-// for small scale testing
-type TwoWordPackage struct {
-	Tenwords []Word `json:"twowords"`
 	Date     string `json:"date"` //in this format: 01-02-2006
 }
 
@@ -48,11 +61,40 @@ func getTenWordsByID(w http.ResponseWriter, r *http.Request) {
 
 	//Loop through the words and find the one with the correct id
 	//the correct id for ten word packets: scalar * 10 + 1 --> 1, 11, 21, 31, 41, etc.
-	//the correct id for two word packets: scalar * 10 + 1 --> 1, 3, 5, 7, etc.
 
 	for index, item := range allWords {
 		if item.ID == params["id"] {
 			var tenWords = TenWordPackage{allWords[index : index+10], currentTime.Format("01-02-2006")}
+			for i, _ := range tenWords.Tenwords {
+				languageCodes := [6]string{"es", "fr", "ru", "it", "ja", "zh-cn"}
+				for _, languageCode := range languageCodes {
+
+					result, err := t.Translate(item.Word, "auto", languageCode)
+					if err != nil {
+						panic(err)
+					}
+
+					//Setting the language fields
+					if languageCode == "es" {
+						tenWords.Tenwords[i].Spanish = result.Text
+					}
+					if languageCode == "fr" {
+						tenWords.Tenwords[i].French = result.Text
+					}
+					if languageCode == "ru" {
+						tenWords.Tenwords[i].Russian = result.Text
+					}
+					if languageCode == "it" {
+						tenWords.Tenwords[i].Italian = result.Text
+					}
+					if languageCode == "ja" {
+						tenWords.Tenwords[i].Japanese = result.Text
+					}
+					if languageCode == "zh-cn" {
+						tenWords.Tenwords[i].Chinese = result.Text
+					}
+				}
+			}
 			allPackages = append(allPackages, tenWords)
 			json.NewEncoder(w).Encode(tenWords)
 			return
@@ -73,24 +115,6 @@ func getTenWordsByDate(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-// for small scale testing
-func getTwoWords(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
-	params := mux.Vars(r)
-
-	//Loop through the words and find the one with the correct id
-	//the correct id for ten word packets: scalar * 10 + 1 --> 1, 11, 21, 31, 41, etc.
-	//the correct id for two word packets: scalar * 10 + 1 --> 1, 3, 5, 7, etc.
-
-	for index, item := range allWords {
-		if item.ID == params["id"] {
-			var twoWords = TwoWordPackage{allWords[index : index+2], currentTime.Format("01-02-2006")}
-			json.NewEncoder(w).Encode(twoWords)
-			return
-		}
-	}
-}
-
 func getWord(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	params := mux.Vars(r)
@@ -98,12 +122,45 @@ func getWord(w http.ResponseWriter, r *http.Request) {
 	//Loop through the words and find the one with the correct id
 	for _, item := range allWords {
 		if item.ID == params["id"] {
+			languageCodes := [6]string{"es", "fr", "ru", "it", "ja", "zh-cn"}
+
+			for _, languageCode := range languageCodes {
+				result, err := t.Translate(item.Word, "auto", languageCode)
+				if err != nil {
+					panic(err)
+				}
+
+				//Setting the language fields
+				if languageCode == "es" {
+					item.Spanish = result.Text
+				}
+				if languageCode == "fr" {
+					item.French = result.Text
+				}
+				if languageCode == "ru" {
+					item.Russian = result.Text
+				}
+				if languageCode == "it" {
+					item.Italian = result.Text
+				}
+				if languageCode == "ja" {
+					item.Japanese = result.Text
+				}
+				if languageCode == "zh-cn" {
+					item.Chinese = result.Text
+				}
+			}
+
 			json.NewEncoder(w).Encode(item)
 			return
 		}
 	}
 	json.NewEncoder(w).Encode(&Word{})
 }
+
+/*func setForeignLanguageFields(item Word*) {
+
+} */
 
 func main() {
 	//Init Router
@@ -123,7 +180,8 @@ func main() {
 
 	index := 1
 	for fileScanner.Scan() {
-		allWords = append(allWords, Word{ID: strconv.Itoa(index), Word: fileScanner.Text()})
+		newWord := Word{ID: strconv.Itoa(index), Word: fileScanner.Text()}
+		allWords = append(allWords, newWord)
 		index++
 	}
 
