@@ -53,3 +53,5 @@ type TwoWordPackage struct {
 					}
 				}
 			}
+
+				//r.HandleFunc("/api/words/package/id/{id}", getTenWordsByID).Methods("GET")

@@ -1,16 +1,3 @@
-/*
-	- A functional CRUD RESTFUL API for TenWords application
-	- This API fetches ten word packages from a text file called "wordlist.txt" and uses
-	  golang googletrans library to translate the words into 6 different foreign languages:
-	  spanish, french, russian, italian, japanese, and chinese.
-	- Every time a ten word package is fetched, the date that package was fetched is recorded and
-	  stored in our database
-	- Additionally, it stores the language learning progress of users in a database by recording
-	  what index in wordlist.txt the user left off on.
-	- This API also autogenerates example sentences for each vocabulary word by calling a repository
-	  of millions of english sentences stored in a database
-*/
-
 package main
 
 import (
@@ -27,12 +14,12 @@ import (
 	"github.com/gorilla/mux"
 )
 
-var allWords []Word              //stores all words
-var allPackages []TenWordPackage //stores all the ten word packages created
-var currentTime = time.Now()     //to get current date and time
-var t = translator.New()         //Init translator
+var allWords []Word                             //stores all words
+var allPackages []TenWordPackage                //stores all the ten word packages created
+var currentTime = time.Now()                    //to get current date and time
+var t = translator.New()                        //Init translator
+var result, err = t.Translate("", "auto", "en") //Init result of translation
 
-// Our application lets users learn these languages: spanish, french, russian, italian, japanese, chinese (simplified)
 type Word struct {
 	ID              string `json:"id"`
 	Word            string `json:"english"`  //en
@@ -50,12 +37,7 @@ type TenWordPackage struct {
 	Date     string `json:"date"` //in this format: 01-02-2006
 }
 
-func getAllWords(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(allWords)
-}
-
-func getTenWordsByID(w http.ResponseWriter, r *http.Request) {
+func getTenWordsByID(w http.ResponseWriter, r *http.Request, languageCode string) {
 	w.Header().Set("Content-Type", "application/json")
 	params := mux.Vars(r)
 
@@ -65,35 +47,32 @@ func getTenWordsByID(w http.ResponseWriter, r *http.Request) {
 	for index, item := range allWords {
 		if item.ID == params["id"] {
 			var tenWords = TenWordPackage{allWords[index : index+10], currentTime.Format("01-02-2006")}
-			for i, _ := range tenWords.Tenwords {
-				languageCodes := [6]string{"es", "fr", "ru", "it", "ja", "zh-cn"}
-				for _, languageCode := range languageCodes {
+			for i, tenworditem := range tenWords.Tenwords {
 
-					result, err := t.Translate(item.Word, "auto", languageCode)
-					if err != nil {
-						panic(err)
-					}
-
-					//Setting the language fields
-					if languageCode == "es" {
-						tenWords.Tenwords[i].Spanish = result.Text
-					}
-					if languageCode == "fr" {
-						tenWords.Tenwords[i].French = result.Text
-					}
-					if languageCode == "ru" {
-						tenWords.Tenwords[i].Russian = result.Text
-					}
-					if languageCode == "it" {
-						tenWords.Tenwords[i].Italian = result.Text
-					}
-					if languageCode == "ja" {
-						tenWords.Tenwords[i].Japanese = result.Text
-					}
-					if languageCode == "zh-cn" {
-						tenWords.Tenwords[i].Chinese = result.Text
-					}
+				result, err = t.Translate(tenworditem.Word, "auto", languageCode)
+				if err != nil {
+					panic(err)
 				}
+
+				if languageCode == "es" {
+					tenWords.Tenwords[i].Spanish = result.Text
+				}
+				if languageCode == "fr" {
+					tenWords.Tenwords[i].French = result.Text
+				}
+				if languageCode == "ru" {
+					tenWords.Tenwords[i].Russian = result.Text
+				}
+				if languageCode == "it" {
+					tenWords.Tenwords[i].Italian = result.Text
+				}
+				if languageCode == "ja" {
+					tenWords.Tenwords[i].Japanese = result.Text
+				}
+				if languageCode == "zh-cn" {
+					tenWords.Tenwords[i].Chinese = result.Text
+				}
+
 			}
 			allPackages = append(allPackages, tenWords)
 			json.NewEncoder(w).Encode(tenWords)
@@ -102,53 +81,36 @@ func getTenWordsByID(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func getTenWordsByDate(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
-	params := mux.Vars(r)
-
-	//Loop through the allPackages slice and find the one with the correct date
-	for _, item := range allPackages {
-		if item.Date == params["date"] {
-			json.NewEncoder(w).Encode(item)
-			return
-		}
-	}
-}
-
-func getWord(w http.ResponseWriter, r *http.Request) {
+func getWord(w http.ResponseWriter, r *http.Request, languageCode string) {
 	w.Header().Set("Content-Type", "application/json")
 	params := mux.Vars(r)
 
 	//Loop through the words and find the one with the correct id
 	for _, item := range allWords {
 		if item.ID == params["id"] {
-			languageCodes := [6]string{"es", "fr", "ru", "it", "ja", "zh-cn"}
+			result, err := t.Translate(item.Word, "auto", languageCode)
+			if err != nil {
+				panic(err)
+			}
 
-			for _, languageCode := range languageCodes {
-				result, err := t.Translate(item.Word, "auto", languageCode)
-				if err != nil {
-					panic(err)
-				}
-
-				//Setting the language fields
-				if languageCode == "es" {
-					item.Spanish = result.Text
-				}
-				if languageCode == "fr" {
-					item.French = result.Text
-				}
-				if languageCode == "ru" {
-					item.Russian = result.Text
-				}
-				if languageCode == "it" {
-					item.Italian = result.Text
-				}
-				if languageCode == "ja" {
-					item.Japanese = result.Text
-				}
-				if languageCode == "zh-cn" {
-					item.Chinese = result.Text
-				}
+			//Setting the language fields
+			if languageCode == "es" {
+				item.Spanish = result.Text
+			}
+			if languageCode == "fr" {
+				item.French = result.Text
+			}
+			if languageCode == "ru" {
+				item.Russian = result.Text
+			}
+			if languageCode == "it" {
+				item.Italian = result.Text
+			}
+			if languageCode == "ja" {
+				item.Japanese = result.Text
+			}
+			if languageCode == "zh-cn" {
+				item.Chinese = result.Text
 			}
 
 			json.NewEncoder(w).Encode(item)
@@ -158,15 +120,49 @@ func getWord(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(&Word{})
 }
 
-/*func setForeignLanguageFields(item Word*) {
+// this doesn't really work right now but I'll fix it later
+func getTenWordsByDate(w http.ResponseWriter, r *http.Request, languageCode string) {
+	w.Header().Set("Content-Type", "application/json")
+	params := mux.Vars(r)
 
-} */
+	//Loop through the allPackages slice and find the one with the correct date
+	for _, item := range allPackages {
+		if item.Date == params["date"] {
+			for i, tenworditem := range item.Tenwords {
+
+				result, err = t.Translate(tenworditem.Word, "auto", languageCode)
+				if err != nil {
+					panic(err)
+				}
+
+				if languageCode == "es" {
+					item.Tenwords[i].Spanish = result.Text
+				}
+				if languageCode == "fr" {
+					item.Tenwords[i].French = result.Text
+				}
+				if languageCode == "ru" {
+					item.Tenwords[i].Russian = result.Text
+				}
+				if languageCode == "it" {
+					item.Tenwords[i].Italian = result.Text
+				}
+				if languageCode == "ja" {
+					item.Tenwords[i].Japanese = result.Text
+				}
+				if languageCode == "zh-cn" {
+					item.Tenwords[i].Chinese = result.Text
+				}
+			}
+			json.NewEncoder(w).Encode(item)
+			return
+		}
+	}
+}
 
 func main() {
-	//Init Router
-	r := mux.NewRouter()
+	r := mux.NewRouter() //Init Router
 
-	//@todo - implement DB
 	//Take all words from wordlist.txt and put them in allWords slice
 	readFile, err := os.Open("wordlist.txt")
 
@@ -185,10 +181,69 @@ func main() {
 		index++
 	}
 
-	//Route Handlers
-	r.HandleFunc("/api/words", getAllWords).Methods("GET")
-	r.HandleFunc("/api/words/package/id/{id}", getTenWordsByID).Methods("GET")
-	r.HandleFunc("/api/words/single/{id}", getWord).Methods("GET")
-	r.HandleFunc("/api/words/package/date/{date}", getTenWordsByDate).Methods("GET")
+	/* ===== Route Handlers ===== */
+
+	//Route Handlers for fetching 10 word packages in each of the foreign languages
+	r.HandleFunc("/api/words/spanish/package/{id}", func(w http.ResponseWriter, r *http.Request) {
+		getTenWordsByID(w, r, "es")
+	}).Methods("GET")
+	r.HandleFunc("/api/words/french/package/{id}", func(w http.ResponseWriter, r *http.Request) {
+		getTenWordsByID(w, r, "fr")
+	}).Methods("GET")
+	r.HandleFunc("/api/words/russian/package/{id}", func(w http.ResponseWriter, r *http.Request) {
+		getTenWordsByID(w, r, "ru")
+	}).Methods("GET")
+	r.HandleFunc("/api/words/italian/package/{id}", func(w http.ResponseWriter, r *http.Request) {
+		getTenWordsByID(w, r, "it")
+	}).Methods("GET")
+	r.HandleFunc("/api/words/japanese/package/{id}", func(w http.ResponseWriter, r *http.Request) {
+		getTenWordsByID(w, r, "ja")
+	}).Methods("GET")
+	r.HandleFunc("/api/words/chinese/package/{id}", func(w http.ResponseWriter, r *http.Request) {
+		getTenWordsByID(w, r, "zh-cn")
+	}).Methods("GET")
+
+	//Route Handlers for fetching a single word in each of the foreign languages (for testing)
+	r.HandleFunc("/api/words/spanish/single/{id}", func(w http.ResponseWriter, r *http.Request) {
+		getWord(w, r, "es")
+	}).Methods("GET")
+	r.HandleFunc("/api/words/french/single/{id}", func(w http.ResponseWriter, r *http.Request) {
+		getWord(w, r, "fr")
+	}).Methods("GET")
+	r.HandleFunc("/api/words/russian/single/{id}", func(w http.ResponseWriter, r *http.Request) {
+		getWord(w, r, "ru")
+	}).Methods("GET")
+	r.HandleFunc("/api/words/italian/single/{id}", func(w http.ResponseWriter, r *http.Request) {
+		getWord(w, r, "it")
+	}).Methods("GET")
+	r.HandleFunc("/api/words/japanese/single/{id}", func(w http.ResponseWriter, r *http.Request) {
+		getWord(w, r, "ja")
+	}).Methods("GET")
+	r.HandleFunc("/api/words/chinese/single/{id}", func(w http.ResponseWriter, r *http.Request) {
+		getWord(w, r, "zh-cn")
+	}).Methods("GET")
+
+	//Route Handlers for fetching 10 word packages in each of the foreign languages by their date
+	r.HandleFunc("/api/words/spanish/package/date/{date}", func(w http.ResponseWriter, r *http.Request) {
+		getTenWordsByID(w, r, "es")
+	}).Methods("GET")
+	r.HandleFunc("/api/words/french/package/date/{date}", func(w http.ResponseWriter, r *http.Request) {
+		getTenWordsByID(w, r, "fr")
+	}).Methods("GET")
+	r.HandleFunc("/api/words/russian/package/date/{date}", func(w http.ResponseWriter, r *http.Request) {
+		getTenWordsByID(w, r, "ru")
+	}).Methods("GET")
+	r.HandleFunc("/api/words/italian/package/date/{date}", func(w http.ResponseWriter, r *http.Request) {
+		getTenWordsByID(w, r, "it")
+	}).Methods("GET")
+	r.HandleFunc("/api/words/japanese/package/date/{date}", func(w http.ResponseWriter, r *http.Request) {
+		getTenWordsByID(w, r, "ja")
+	}).Methods("GET")
+	r.HandleFunc("/api/words/chinese/package/date/{date}", func(w http.ResponseWriter, r *http.Request) {
+		getTenWordsByID(w, r, "zh-cn")
+	}).Methods("GET")
+
 	log.Fatal(http.ListenAndServe(":8000", r))
 }
+
+//See this: https://stackoverflow.com/questions/26211954/how-do-i-pass-arguments-to-my-handler
