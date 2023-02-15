@@ -21,15 +21,20 @@ var t = translator.New()                        //Init translator
 var result, err = t.Translate("", "auto", "en") //Init result of translation
 
 type Word struct {
-	ID              string `json:"id"`
-	Word            string `json:"english"`  //en
-	Spanish         string `json:"spanish"`  //es
-	French          string `json:"french"`   //fr
-	Russian         string `json:"russian"`  //ru
-	Italian         string `json:"italian"`  //it
-	Japanese        string `json:"japanese"` //ja
-	Chinese         string `json:"chinese"`  //zh-cn
-	Examplesentence string `json:"examplesentence"`
+	ID                       string `json:"id"`
+	Word                     string `json:"english"`  //en
+	Spanish                  string `json:"spanish"`  //es
+	French                   string `json:"french"`   //fr
+	Russian                  string `json:"russian"`  //ru
+	Italian                  string `json:"italian"`  //it
+	Japanese                 string `json:"japanese"` //ja
+	Chinese                  string `json:"chinese"`  //zh-cn
+	Examplesentence_spanish  string `json:"examplesentence_spanish"`
+	Examplesentence_french   string `json:"examplesentence_french"`
+	Examplesentence_russian  string `json:"examplesentence_russian"`
+	Examplesentence_italian  string `json:"examplesentence_italian"`
+	Examplesentence_japanese string `json:"examplesentence_japanese"`
+	Examplesentence_chinese  string `json:"examplesentence_chinese"`
 }
 
 type TenWordPackage struct {
