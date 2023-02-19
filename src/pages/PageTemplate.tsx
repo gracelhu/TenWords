@@ -1,0 +1,11 @@
+import React from 'react';
+import Navigation from '../components/Navigation'
+
+export default function PageTemplate(Props: any) {
+    return (
+    <>
+        <Navigation/>
+        {Props.children}
+    </>
+    );
+}
