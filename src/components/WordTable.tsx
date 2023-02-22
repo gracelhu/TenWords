@@ -12,7 +12,7 @@ import Paper from '@mui/material/Paper';
 
 
 interface Props {
-  words: { 
+  words: {
     english: string;
     spanish: string; 
     french: string;
