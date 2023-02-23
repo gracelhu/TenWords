@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"encoding/json"
 	"fmt"
+	"io"
 	"log"
 	"net/http"
 	"os"
@@ -14,27 +15,22 @@ import (
 	"github.com/gorilla/mux"
 )
 
-var allWords []Word                             //stores all words
-var allPackages []TenWordPackage                //stores all the ten word packages created
-var currentTime = time.Now()                    //to get current date and time
-var t = translator.New()                        //Init translator
-var result, err = t.Translate("", "auto", "en") //Init result of translation
+var allWords []Word                                                       //stores all words
+var allPackages []TenWordPackage                                          //stores all the ten word packages created
+var currentTime = time.Now()                                              //to get current date and time
+var t = translator.New()                                                  //Init translator
+var result, err = t.Translate("", "auto", "en")                           //Init result of translation
+var dictionaryapiURL = "https://api.dictionaryapi.dev/api/v2/entries/en/" //the word we're interested in fetching information for will be appended to this url
 
 type Word struct {
-	ID                       string `json:"id"`
-	Word                     string `json:"english"`  //en
-	Spanish                  string `json:"spanish"`  //es
-	French                   string `json:"french"`   //fr
-	Russian                  string `json:"russian"`  //ru
-	Italian                  string `json:"italian"`  //it
-	Japanese                 string `json:"japanese"` //ja
-	Chinese                  string `json:"chinese"`  //zh-cn
-	Examplesentence_spanish  string `json:"examplesentence_spanish"`
-	Examplesentence_french   string `json:"examplesentence_french"`
-	Examplesentence_russian  string `json:"examplesentence_russian"`
-	Examplesentence_italian  string `json:"examplesentence_italian"`
-	Examplesentence_japanese string `json:"examplesentence_japanese"`
-	Examplesentence_chinese  string `json:"examplesentence_chinese"`
+	ID                      string `json:"id"`
+	Word                    string `json:"english"`    //en
+	Foreignword             string `json:"foreignword` //could be es, fr, ru, it, ja, or zh-cn
+	Examplesentence_english string `json:"examplesentence_english"`
+	Examplesentence_foreign string `json:"examplesentence_foreign"`
+	English_definition      string `json:"english_definition"`
+	Foreign_definition      string `json:"foreign_definition"`
+	Audiofilelink           string `json:"audiofilelink"`
 }
 
 type TenWordPackage struct {
@@ -42,6 +38,53 @@ type TenWordPackage struct {
 	Date     string `json:"date"` //in this format: 01-02-2006
 }
 
+// This function will be called by the route handler functions to fetch a word's information, like its:
+// definition, example sentence, audio file link, etc. This information is being fetched using a free
+// api called "Free Dictionary API". The struct used to demarshall the api's json response is in the file
+// "dictionaryapi.go". Additionally, this function will only be returning ENGLISH information. The information
+// will be translated to different languages in the route handler functions using the golang google translate api
+
+func getWordInfo(word string, infoType string) string {
+
+	apiURL := dictionaryapiURL + word
+
+	resp, err := http.Get(apiURL)
+	if err != nil {
+		// handle error
+	}
+	defer resp.Body.Close()
+
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		// handle error
+	}
+
+	var val []Words
+	if err := json.Unmarshal([]byte(body), &val); err != nil {
+		panic(err)
+	}
+
+	if infoType == "definition" {
+		return val[0].Meanings[0].Definitions[0].Definition
+	}
+	if infoType == "examplesentence" {
+		for i := 0; i < len(val[0].Meanings); i++ {
+			for x := 0; x < len(val[0].Meanings[i].Definitions); x++ {
+				if val[0].Meanings[i].Definitions[x].Example != "" {
+					return val[0].Meanings[i].Definitions[x].Example
+				}
+			}
+		}
+	}
+	if infoType == "audiofilelink" {
+		for i := 0; i < len(val[0].Phonetics); i++ {
+			if val[0].Phonetics[i].Audio != "" {
+				return val[0].Phonetics[i].Audio
+			}
+		}
+	}
+	return ""
+}
 func getTenWordsByID(w http.ResponseWriter, r *http.Request, languageCode string) {
 	w.Header().Set("Content-Type", "application/json")
 	params := mux.Vars(r)
@@ -54,30 +97,22 @@ func getTenWordsByID(w http.ResponseWriter, r *http.Request, languageCode string
 			var tenWords = TenWordPackage{allWords[index : index+10], currentTime.Format("01-02-2006")}
 			for i, tenworditem := range tenWords.Tenwords {
 
+				//Set the English_definition, Examplesentence_english, and Audiofilelink fields by calling
+				//the function getWordInfo
+				tenWords.Tenwords[i].English_definition = getWordInfo(tenWords.Tenwords[i].Word, "definition")
+				tenWords.Tenwords[i].Audiofilelink = getWordInfo(tenWords.Tenwords[i].Word, "audiofilelink")
+				tenWords.Tenwords[i].Examplesentence_english = getWordInfo(tenWords.Tenwords[i].Word, "examplesentence")
 				result, err = t.Translate(tenworditem.Word, "auto", languageCode)
 				if err != nil {
 					panic(err)
 				}
+				tenWords.Tenwords[i].Foreignword = result.Text
 
-				if languageCode == "es" {
-					tenWords.Tenwords[i].Spanish = result.Text
-				}
-				if languageCode == "fr" {
-					tenWords.Tenwords[i].French = result.Text
-				}
-				if languageCode == "ru" {
-					tenWords.Tenwords[i].Russian = result.Text
-				}
-				if languageCode == "it" {
-					tenWords.Tenwords[i].Italian = result.Text
-				}
-				if languageCode == "ja" {
-					tenWords.Tenwords[i].Japanese = result.Text
-				}
-				if languageCode == "zh-cn" {
-					tenWords.Tenwords[i].Chinese = result.Text
-				}
+				result, _ = t.Translate(tenWords.Tenwords[i].English_definition, "auto", languageCode)
+				tenWords.Tenwords[i].Foreign_definition = result.Text
 
+				result, _ = t.Translate(tenWords.Tenwords[i].Examplesentence_english, "auto", languageCode)
+				tenWords.Tenwords[i].Examplesentence_foreign = result.Text
 			}
 			allPackages = append(allPackages, tenWords)
 			json.NewEncoder(w).Encode(tenWords)
@@ -97,26 +132,13 @@ func getWord(w http.ResponseWriter, r *http.Request, languageCode string) {
 			if err != nil {
 				panic(err)
 			}
+			item.Foreignword = result.Text
 
-			//Setting the language fields
-			if languageCode == "es" {
-				item.Spanish = result.Text
-			}
-			if languageCode == "fr" {
-				item.French = result.Text
-			}
-			if languageCode == "ru" {
-				item.Russian = result.Text
-			}
-			if languageCode == "it" {
-				item.Italian = result.Text
-			}
-			if languageCode == "ja" {
-				item.Japanese = result.Text
-			}
-			if languageCode == "zh-cn" {
-				item.Chinese = result.Text
-			}
+			result, _ = t.Translate(item.English_definition, "auto", languageCode)
+			item.Foreign_definition = result.Text
+
+			result, _ = t.Translate(item.Examplesentence_english, "auto", languageCode)
+			item.Examplesentence_foreign = result.Text
 
 			json.NewEncoder(w).Encode(item)
 			return
@@ -139,25 +161,7 @@ func getTenWordsByDate(w http.ResponseWriter, r *http.Request, languageCode stri
 				if err != nil {
 					panic(err)
 				}
-
-				if languageCode == "es" {
-					item.Tenwords[i].Spanish = result.Text
-				}
-				if languageCode == "fr" {
-					item.Tenwords[i].French = result.Text
-				}
-				if languageCode == "ru" {
-					item.Tenwords[i].Russian = result.Text
-				}
-				if languageCode == "it" {
-					item.Tenwords[i].Italian = result.Text
-				}
-				if languageCode == "ja" {
-					item.Tenwords[i].Japanese = result.Text
-				}
-				if languageCode == "zh-cn" {
-					item.Tenwords[i].Chinese = result.Text
-				}
+				item.Tenwords[i].Foreignword = result.Text
 			}
 			json.NewEncoder(w).Encode(item)
 			return
