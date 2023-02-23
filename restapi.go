@@ -24,8 +24,8 @@ var dictionaryapiURL = "https://api.dictionaryapi.dev/api/v2/entries/en/" //the 
 
 type Word struct {
 	ID                      string `json:"id"`
-	Word                    string `json:"english"`    //en
-	Foreignword             string `json:"foreignword` //could be es, fr, ru, it, ja, or zh-cn
+	Word                    string `json:"english"`     //en
+	Foreignword             string `json:"foreignword"` //could be es, fr, ru, it, ja, or zh-cn
 	Examplesentence_english string `json:"examplesentence_english"`
 	Examplesentence_foreign string `json:"examplesentence_foreign"`
 	English_definition      string `json:"english_definition"`
