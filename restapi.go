@@ -38,11 +38,13 @@ type TenWordPackage struct {
 	Date     string `json:"date"` //in this format: 01-02-2006
 }
 
-// This function will be called by the route handler functions to fetch a word's information, like its:
-// definition, example sentence, audio file link, etc. This information is being fetched using a free
-// api called "Free Dictionary API". The struct used to demarshall the api's json response is in the file
-// "dictionaryapi.go". Additionally, this function will only be returning ENGLISH information. The information
-// will be translated to different languages in the route handler functions using the golang google translate api
+/*
+This function will be called by the route handler functions to fetch a word's information, like its:
+definition, example sentence, audio file link, etc. This information is being fetched using a free
+api called "Free Dictionary API". The struct used to demarshall the api's json response is in the file
+"dictionaryapi.go". Additionally, this function will only be returning ENGLISH information. The information
+will be translated to different languages in the route handler functions using the golang google translate api
+*/
 
 func getWordInfo(word string, infoType string) string {
 
@@ -85,7 +87,7 @@ func getWordInfo(word string, infoType string) string {
 	}
 	return ""
 }
-func getTenWordsByID(w http.ResponseWriter, r *http.Request, languageCode string) {
+func getTenWordsByID(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	params := mux.Vars(r)
 
@@ -102,16 +104,16 @@ func getTenWordsByID(w http.ResponseWriter, r *http.Request, languageCode string
 				tenWords.Tenwords[i].English_definition = getWordInfo(tenWords.Tenwords[i].Word, "definition")
 				tenWords.Tenwords[i].Audiofilelink = getWordInfo(tenWords.Tenwords[i].Word, "audiofilelink")
 				tenWords.Tenwords[i].Examplesentence_english = getWordInfo(tenWords.Tenwords[i].Word, "examplesentence")
-				result, err = t.Translate(tenworditem.Word, "auto", languageCode)
+				result, err = t.Translate(tenworditem.Word, "auto", params["languagecode"])
 				if err != nil {
 					panic(err)
 				}
 				tenWords.Tenwords[i].Foreignword = result.Text
 
-				result, _ = t.Translate(tenWords.Tenwords[i].English_definition, "auto", languageCode)
+				result, _ = t.Translate(tenWords.Tenwords[i].English_definition, "auto", params["languagecode"])
 				tenWords.Tenwords[i].Foreign_definition = result.Text
 
-				result, _ = t.Translate(tenWords.Tenwords[i].Examplesentence_english, "auto", languageCode)
+				result, _ = t.Translate(tenWords.Tenwords[i].Examplesentence_english, "auto", params["languagecode"])
 				tenWords.Tenwords[i].Examplesentence_foreign = result.Text
 			}
 			allPackages = append(allPackages, tenWords)
@@ -121,23 +123,26 @@ func getTenWordsByID(w http.ResponseWriter, r *http.Request, languageCode string
 	}
 }
 
-func getWord(w http.ResponseWriter, r *http.Request, languageCode string) {
+func getWord(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	params := mux.Vars(r)
 
 	//Loop through the words and find the one with the correct id
 	for _, item := range allWords {
 		if item.ID == params["id"] {
-			result, err := t.Translate(item.Word, "auto", languageCode)
+			result, err = t.Translate(item.Word, "auto", params["languagecode"])
 			if err != nil {
 				panic(err)
 			}
+
 			item.Foreignword = result.Text
+			item.English_definition = getWordInfo(item.Word, "definition")
+			item.Audiofilelink = getWordInfo(item.Word, "audiofilelink")
+			item.Examplesentence_english = getWordInfo(item.Word, "examplesentence")
 
-			result, _ = t.Translate(item.English_definition, "auto", languageCode)
+			result, _ = t.Translate(item.English_definition, "auto", params["languagecode"])
 			item.Foreign_definition = result.Text
-
-			result, _ = t.Translate(item.Examplesentence_english, "auto", languageCode)
+			result, _ = t.Translate(item.Examplesentence_english, "auto", params["languagecode"])
 			item.Examplesentence_foreign = result.Text
 
 			json.NewEncoder(w).Encode(item)
@@ -148,7 +153,7 @@ func getWord(w http.ResponseWriter, r *http.Request, languageCode string) {
 }
 
 // this doesn't really work right now but I'll fix it later
-func getTenWordsByDate(w http.ResponseWriter, r *http.Request, languageCode string) {
+func getTenWordsByDate(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	params := mux.Vars(r)
 
@@ -157,7 +162,7 @@ func getTenWordsByDate(w http.ResponseWriter, r *http.Request, languageCode stri
 		if item.Date == params["date"] {
 			for i, tenworditem := range item.Tenwords {
 
-				result, err = t.Translate(tenworditem.Word, "auto", languageCode)
+				result, err = t.Translate(tenworditem.Word, "auto", params["languagecode"])
 				if err != nil {
 					panic(err)
 				}
@@ -180,7 +185,6 @@ func main() {
 	}
 
 	fileScanner := bufio.NewScanner(readFile)
-
 	fileScanner.Split(bufio.ScanLines)
 
 	index := 1
@@ -192,67 +196,14 @@ func main() {
 
 	/* ===== Route Handlers ===== */
 
-	//Route Handlers for fetching 10 word packages in each of the foreign languages
-	r.HandleFunc("/api/words/spanish/package/{id}", func(w http.ResponseWriter, r *http.Request) {
-		getTenWordsByID(w, r, "es")
-	}).Methods("GET")
-	r.HandleFunc("/api/words/french/package/{id}", func(w http.ResponseWriter, r *http.Request) {
-		getTenWordsByID(w, r, "fr")
-	}).Methods("GET")
-	r.HandleFunc("/api/words/russian/package/{id}", func(w http.ResponseWriter, r *http.Request) {
-		getTenWordsByID(w, r, "ru")
-	}).Methods("GET")
-	r.HandleFunc("/api/words/italian/package/{id}", func(w http.ResponseWriter, r *http.Request) {
-		getTenWordsByID(w, r, "it")
-	}).Methods("GET")
-	r.HandleFunc("/api/words/japanese/package/{id}", func(w http.ResponseWriter, r *http.Request) {
-		getTenWordsByID(w, r, "ja")
-	}).Methods("GET")
-	r.HandleFunc("/api/words/chinese/package/{id}", func(w http.ResponseWriter, r *http.Request) {
-		getTenWordsByID(w, r, "zh-cn")
-	}).Methods("GET")
+	//Route Handler for fetching 10 word packages in each of the foreign languages by their starting index
+	r.HandleFunc("/api/words/{languagecode}/package/{id}", getTenWordsByID).Methods("GET")
 
-	//Route Handlers for fetching a single word in each of the foreign languages (for testing)
-	r.HandleFunc("/api/words/spanish/single/{id}", func(w http.ResponseWriter, r *http.Request) {
-		getWord(w, r, "es")
-	}).Methods("GET")
-	r.HandleFunc("/api/words/french/single/{id}", func(w http.ResponseWriter, r *http.Request) {
-		getWord(w, r, "fr")
-	}).Methods("GET")
-	r.HandleFunc("/api/words/russian/single/{id}", func(w http.ResponseWriter, r *http.Request) {
-		getWord(w, r, "ru")
-	}).Methods("GET")
-	r.HandleFunc("/api/words/italian/single/{id}", func(w http.ResponseWriter, r *http.Request) {
-		getWord(w, r, "it")
-	}).Methods("GET")
-	r.HandleFunc("/api/words/japanese/single/{id}", func(w http.ResponseWriter, r *http.Request) {
-		getWord(w, r, "ja")
-	}).Methods("GET")
-	r.HandleFunc("/api/words/chinese/single/{id}", func(w http.ResponseWriter, r *http.Request) {
-		getWord(w, r, "zh-cn")
-	}).Methods("GET")
+	//Route Handler for fetching a single word in each of the foreign languages by their index
+	r.HandleFunc("/api/words/{languagecode}/single/{id}", getWord).Methods("GET")
 
-	//Route Handlers for fetching 10 word packages in each of the foreign languages by their date
-	r.HandleFunc("/api/words/spanish/package/date/{date}", func(w http.ResponseWriter, r *http.Request) {
-		getTenWordsByID(w, r, "es")
-	}).Methods("GET")
-	r.HandleFunc("/api/words/french/package/date/{date}", func(w http.ResponseWriter, r *http.Request) {
-		getTenWordsByID(w, r, "fr")
-	}).Methods("GET")
-	r.HandleFunc("/api/words/russian/package/date/{date}", func(w http.ResponseWriter, r *http.Request) {
-		getTenWordsByID(w, r, "ru")
-	}).Methods("GET")
-	r.HandleFunc("/api/words/italian/package/date/{date}", func(w http.ResponseWriter, r *http.Request) {
-		getTenWordsByID(w, r, "it")
-	}).Methods("GET")
-	r.HandleFunc("/api/words/japanese/package/date/{date}", func(w http.ResponseWriter, r *http.Request) {
-		getTenWordsByID(w, r, "ja")
-	}).Methods("GET")
-	r.HandleFunc("/api/words/chinese/package/date/{date}", func(w http.ResponseWriter, r *http.Request) {
-		getTenWordsByID(w, r, "zh-cn")
-	}).Methods("GET")
+	//Route Handler for fetching 10 word packages in each of the foreign languages by their date
+	r.HandleFunc("/api/words/{languagecode}/package/date/{date}", getTenWordsByDate).Methods("GET")
 
 	log.Fatal(http.ListenAndServe(":8000", r))
 }
-
-//See this: https://stackoverflow.com/questions/26211954/how-do-i-pass-arguments-to-my-handler
