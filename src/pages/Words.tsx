@@ -26,7 +26,7 @@ function Words() {
             method: "GET",
             mode: "no-cors",
         } 
-        fetch("http://localhost:8000/api/words/package/id/1")
+        fetch("api/words/package/id/1")
         .then(res => res.json())
         .then(
             (result) => {
@@ -71,7 +71,7 @@ function Words() {
     if (error) {
         return (
             <PageTemplate>
-                <div>Error: {error.message}</div>
+                <div>Error:</div>
             </PageTemplate>
         );
     } else if (isLoaded) {
