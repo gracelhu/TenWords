@@ -11,7 +11,6 @@ import Select, { SelectChangeEvent } from '@mui/material/Select';
 import FormControl from '@mui/material/FormControl';
 import Paper from '@mui/material/Paper';
 import Box from '@mui/material/Box';
-import { dummy_data } from './dummy_data';
 
 function Words() {
 
@@ -19,7 +18,6 @@ function Words() {
     const [isLoaded, setLoaded] = useState(false);
     const [error, setError] = useState(null);
     const [items, setItems] = useState<any>([]);
-    const from_api = dummy_data
     
     useEffect(() => {
         const requestOptions = {
@@ -40,14 +38,6 @@ function Words() {
         )
     });
     
-   /*
-    useEffect(() => {
-        setItems(dummy_data);
-        setLoaded(true);
-    });
-    */
-
-    
     const languages = [
         "spanish",
         "french",
@@ -66,25 +56,20 @@ function Words() {
     const languageDropDown = languages.map((language, key) => <option key={key} value={language}>{language[0].toUpperCase() + language.substring(1)}</option>)
 
 
-    const date = new Date(from_api.date);
-
-    if (error) {
-        return (
-            <PageTemplate>
-                <div>Error:</div>
-            </PageTemplate>
-        );
-    } else if (isLoaded) {
+    const date = new Date(items.date);
         
-        const flashcards = items["tenwords"].map((words: any, index: any) => (
+    let flashcards = [];
+    if (isLoaded){
+        flashcards = items["tenwords"].map((words: any, index: any) => (
             {
                 id: index,
                 frontHTML: <Grid container sx={{ height: '100%' }} alignItems="center" justifyContent="center"><Grid item><h1>{words.english}</h1></Grid></Grid>,
                 backHTML: <Grid container sx={{ height: '100%' }} alignItems="center" justifyContent="center"><Grid item><h1>{words.translation}</h1></Grid></Grid>
             }
-        )
-       
+            )  
         );
+    }
+
         return (
             <PageTemplate>
                 <Box sx={{mt: "30px", ml: "10%", width: "80%"}}>
@@ -109,11 +94,11 @@ function Words() {
                             spacing={5}>
                             <Grid item>
                                 <Box sx={{width: "100%"}}>
-                                    <FlashcardArray cards={flashcards}/>
+                                    {isLoaded ? <FlashcardArray cards={flashcards}/> : <h1>Loading...</h1>}
                                 </Box>
                             </Grid>
                             <Grid item sx={{width: "80%"}}>
-                                <WordTable words={items["tenwords"]} language={language}/>  
+                                {isLoaded ? <WordTable words={items["tenwords"]} language={language}/> : <h1>Loading...</h1>}
                             </Grid>
                         </Grid>
                     </Paper>
@@ -121,14 +106,6 @@ function Words() {
                 </Box>          
             </PageTemplate>
         );
-    } else {
-        return (
-            <PageTemplate>
-                <h1 style={{textAlign: "center"}}>Loading...</h1>
-            </PageTemplate>
-        );
-
-    }
 }
 
 export default Words;
