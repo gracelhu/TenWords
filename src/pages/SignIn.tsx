@@ -17,6 +17,7 @@ export default function SignIn() {
 				id="outlined-basic"
 				label="Username"
 				variant="filled"
+				data-cy="field_username"
 			/>
 			
 			<TextField
@@ -25,6 +26,7 @@ export default function SignIn() {
 				type="password"
 				autoComplete="current-password"
 				variant="filled"
+				data-cy="field_password"
 			/>
 			
 			<Button
@@ -33,6 +35,7 @@ export default function SignIn() {
 				onClick={() => {
 					alert('Trigger login');
 				}}
+				data-cy="btn_login"
 			>
 				Sign In
 			</Button>

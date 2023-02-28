@@ -17,19 +17,37 @@ function Words() {
 
     const [language, setLanguage] = useState<string>("spanish");
     const [isLoaded, setLoaded] = useState(false);
+    const [error, setError] = useState(null);
     const [items, setItems] = useState<any>([]);
+    const from_api = dummy_data
+    
     useEffect(() => {
-        fetch("/api/words/package/id/1")
+        const requestOptions = {
+            method: "GET",
+            mode: "no-cors",
+        } 
+        fetch("http://localhost:8000/api/words/package/id/1")
         .then(res => res.json())
         .then(
             (result) => {
                 setItems(result);
                 setLoaded(true);
             },
+            (error) => {
+                setLoaded(true);
+                setError(error);
+            }
         )
     });
+    
+   /*
+    useEffect(() => {
+        setItems(dummy_data);
+        setLoaded(true);
+    });
+    */
 
-    const from_api = dummy_data
+    
     const languages = [
         "spanish",
         "french",
@@ -50,7 +68,13 @@ function Words() {
 
     const date = new Date(from_api.date);
 
-    if (isLoaded) {
+    if (error) {
+        return (
+            <PageTemplate>
+                <div>Error: {error.message}</div>
+            </PageTemplate>
+        );
+    } else if (isLoaded) {
         
         const flashcards = items["tenwords"].map((words: any, index: any) => (
             {

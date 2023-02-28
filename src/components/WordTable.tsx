@@ -55,25 +55,25 @@ export default function WordTable({words, language}: Props) {
             <TableHead>
               <TableRow>
                 <TableCell></TableCell>
-                <TableCell><b>English</b></TableCell>
+                <TableCell data-cy="eng_header"><b>English</b></TableCell>
                 <TableCell><b></b></TableCell>
-                <TableCell><b data-testid="to-language">{upperCaseLanguage}</b></TableCell>
+                <TableCell data-cy="lang_header"><b data-testid="to-language">{upperCaseLanguage}</b></TableCell>
                 <TableCell><b></b></TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
               {words.map((word, index) => (
-                <TableRow key={index + 1} data-testid={"table_" + (index + 1)}>
+                <TableRow key={index + 1} data-testid={"table_" + (index + 1) } data-cy={"table_" + (index + 1)}>
                     <TableCell>{index + 1}</TableCell>
-                    <TableCell>{word.english}</TableCell>
+                    <TableCell data-cy={"eng_word_"+(index+1)}>{word.english}</TableCell>
                     {canListen ? <TableCell>
-                        <IconButton color="primary" onClick={() => handleClick(word.english, "english")}>
+                        <IconButton data-cy={"btn_speak_eng_"+(index+1)} color="primary" onClick={() => handleClick(word.english, "english")}>
                             <VolumeUpIcon />
                         </IconButton>
                     </TableCell> : <></>}
-                    <TableCell>{word[language as keyof typeof word]}</TableCell>
+                    <TableCell data-cy={"lang_word_"+(index+1)}>{word[language as keyof typeof word]}</TableCell>
                     {canListen ? <TableCell>
-                      <IconButton color="primary"  onClick={() => handleClick(word[language as keyof typeof word], language)}>
+                      <IconButton data-cy={"btn_speak_lang_"+(index+1)} color="primary"  onClick={() => handleClick(word[language as keyof typeof word], language)}>
                           <VolumeUpIcon />
                       </IconButton>
                     </TableCell> : <></>}
