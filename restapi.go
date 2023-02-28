@@ -2,17 +2,22 @@ package main
 
 import (
 	"bufio"
+	"context"
 	"encoding/json"
 	"fmt"
 	"io"
 	"log"
 	"net/http"
 	"os"
+	"reflect"
 	"strconv"
 	"time"
 
 	translator "github.com/Conight/go-googletrans"
 	"github.com/gorilla/mux"
+	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 var allWords []Word                                                       //stores all words
@@ -21,6 +26,10 @@ var currentTime = time.Now()                                              //to g
 var t = translator.New()                                                  //Init translator
 var result, err = t.Translate("", "auto", "en")                           //Init result of translation
 var dictionaryapiURL = "https://api.dictionaryapi.dev/api/v2/entries/en/" //the word we're interested in fetching information for will be appended to this url
+//variables for params["id"], date, and map use in Mongodb
+var dateP = currentTime.Format("01-02-2006")
+var ProgressIndexP string
+var MapDatetoindex = make(map[string]string)
 
 type Word struct {
 	ID                      string `json:"id"`
@@ -37,7 +46,11 @@ type TenWordPackage struct {
 	Tenwords []Word `json:"tenwords"`
 	Date     string `json:"date"` //in this format: 01-02-2006
 }
-
+//struct made for use in mongodb
+type MongoField struct {
+	ProgressIndex string            `json:"ProgressIndex"`
+	Map           map[string]string `json:"map"`
+}
 /*
 This function will be called by the route handler functions to fetch a word's information, like its:
 definition, example sentence, audio file link, etc. This information is being fetched using a free
@@ -96,6 +109,8 @@ func getTenWordsByID(w http.ResponseWriter, r *http.Request) {
 
 	for index, item := range allWords {
 		if item.ID == params["id"] {
+			ProgressIndexP = params["id"]
+			updateWordProgress(params["id"])
 			var tenWords = TenWordPackage{allWords[index : index+10], currentTime.Format("01-02-2006")}
 			for i, tenworditem := range tenWords.Tenwords {
 
@@ -173,7 +188,75 @@ func getTenWordsByDate(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 }
+//Function that updates index after each api call
+func updateWordProgress(progressIndex string) {
+	//mongo stuff
+	//Pushing data to mongodb
+	clientOptions := options.Client().ApplyURI("mongodb://localhost:27017")
+	fmt.Println("ClientOptopm TYPE:", reflect.TypeOf(clientOptions))
 
+	client, err := mongo.Connect(context.TODO(), clientOptions)
+	if err != nil {
+		fmt.Println("Mongo.connect() ERROR: ", err)
+		os.Exit(1)
+	}
+	ctx, call := context.WithTimeout(context.Background(), 15*time.Second)
+	defer call()
+	col := client.Database("First_Database").Collection("First COllection3")
+	fmt.Println("Collection Type: ", reflect.TypeOf(col))
+	MapDatetoindex[dateP] = ProgressIndexP
+	fmt.Println("printmap:", MapDatetoindex, "in:", ProgressIndexP)
+	oneDoc := MongoField{
+		
+		ProgressIndex: ProgressIndexP,
+		Map:           MapDatetoindex,
+		
+
+	}
+
+	fmt.Println("oneDoc Type: ", reflect.TypeOf(oneDoc))
+
+	result, insertErr := col.InsertOne(ctx, oneDoc)
+	if insertErr != nil {
+		fmt.Println("InsertONE Error:", insertErr)
+		os.Exit(1)
+	} else {
+		fmt.Println("InsertOne() result type: ", reflect.TypeOf(result))
+		fmt.Println("InsertOne() api result type: ", result)
+
+		newID := result.InsertedID
+		fmt.Println("InsertedOne(), newID", newID)
+		fmt.Println("InsertedOne(), newID type:", reflect.TypeOf(newID))
+
+	}
+
+	//end mongo
+	//retrieve mongodb data
+       filter := bson.M{"ProgressIndex": ProgressIndexP}
+       update := bson.M{"$set": bson.M{
+        "progressindex": progressIndex,
+       }}
+
+     _, errp := col.UpdateOne(context.Background(), filter, update)
+        if errp != nil {
+        log.Fatal(err)
+       }
+
+       fmt.Println("Word progress updated to: ", progressIndex)
+	cursor, err := col.Find(context.TODO(), bson.D{})
+	if err != nil {
+		panic(err)
+	}
+	
+	var results []MongoField
+	if err = cursor.All(context.TODO(), &results); err != nil {
+		panic(err)
+	}
+	for _, result := range results {
+		fmt.Printf("%+v\n", result)
+	}
+	//end retrieve
+}
 func main() {
 	r := mux.NewRouter() //Init Router
 
