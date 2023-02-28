@@ -14,30 +14,29 @@ import Box from '@mui/material/Box';
 
 function Words() {
 
+    const language_code: { [key: string]: string } = {
+        "spanish": "es",
+        "french": "fr",
+        "russian": "ru",
+        "italian": "it",
+        "japanese": "ja",
+        "chinese": "zh-cn"
+    };
     const [language, setLanguage] = useState<string>("spanish");
     const [isLoaded, setLoaded] = useState(false);
-    const [error, setError] = useState(null);
     const [items, setItems] = useState<any>([]);
-    
+
     useEffect(() => {
-        const requestOptions = {
-            method: "GET",
-            mode: "no-cors",
-        } 
-        fetch("api/words/package/id/1")
+        fetch("/api/words/"+language_code[language as keyof typeof language_code]+"/package/1")
         .then(res => res.json())
         .then(
             (result) => {
                 setItems(result);
                 setLoaded(true);
             },
-            (error) => {
-                setLoaded(true);
-                setError(error);
-            }
         )
     });
-    
+
     const languages = [
         "spanish",
         "french",
@@ -51,22 +50,37 @@ function Words() {
         setLanguage(e.target.value);
     }
 
-    const upperCaseLanguage = language[0].toUpperCase() + language.substring(1);
+    const upperCaseLanguage = language[0].toUpperCase() + language.substring(1) || "";
 
-    const languageDropDown = languages.map((language, key) => <option key={key} value={language}>{language[0].toUpperCase() + language.substring(1)}</option>)
+    const languageDropDown = languages.map((value, key) => <option key={key} value={value}>{value[0].toUpperCase() + value.substring(1)}</option>)
 
 
-    const date = new Date(items.date);
-        
+    const date = new Date(items["date"]);
     let flashcards = [];
+    let words_for_table = [];
+    
     if (isLoaded){
-        flashcards = items["tenwords"].map((words: any, index: any) => (
-            {
-                id: index,
-                frontHTML: <Grid container sx={{ height: '100%' }} alignItems="center" justifyContent="center"><Grid item><h1>{words.english}</h1></Grid></Grid>,
-                backHTML: <Grid container sx={{ height: '100%' }} alignItems="center" justifyContent="center"><Grid item><h1>{words.translation}</h1></Grid></Grid>
-            }
-            )  
+        words_for_table = items["tenwords"];
+        flashcards = items["tenwords"].map((words: any, index: any) => ({
+            id: index,
+            frontHTML: <Grid container direction="column" sx={{ height: '100%' }} alignItems="center" justifyContent="center">
+                <Grid item>
+                    <Box width="100%"><h1>{words.english}</h1></Box>
+                </Grid>
+                <Grid item>
+                    <Box width="100%"><p>{words.examplesentence_english}</p></Box>
+                </Grid>
+            </Grid>,
+            backHTML: <Grid container sx={{ height: '100%' }} direction="column"  alignItems="center" justifyContent="center">
+                        <Grid item>
+                        <Box width="100%"><h1>{words.foreignword}</h1></Box>
+                        </Grid>
+                        <Grid item>
+                        <Box width="100%"><p>{words.examplesentence_foreign}</p></Box>
+                        </Grid>
+                    </Grid>
+        }
+        )   
         );
     }
 
@@ -79,13 +93,12 @@ function Words() {
                             <Select
                                 inputProps={{ "data-testid": "language-select" }}
                                 native={true}
-                                value={language}
                                 label="Language"
                                 onChange={handleChangeLanguage}>
                                 {languageDropDown}
                             </Select>
                         </FormControl>
-                        <h1 style={{textAlign: "center"}}>{date.toDateString()}</h1>
+                        <h1 style={{textAlign: "center"}}>Packet 1: {date.toDateString()}</h1>
                         <h2 data-testid="language-subtitle" style={{textAlign: "center"}}>10 Words in {upperCaseLanguage}</h2>
                         <Grid
                             container
@@ -94,11 +107,11 @@ function Words() {
                             spacing={5}>
                             <Grid item>
                                 <Box sx={{width: "100%"}}>
-                                    {isLoaded ? <FlashcardArray cards={flashcards}/> : <h1>Loading...</h1>}
+                                    {isLoaded ? <FlashcardArray cards={flashcards}/> : <></>}
                                 </Box>
                             </Grid>
                             <Grid item sx={{width: "80%"}}>
-                                {isLoaded ? <WordTable words={items["tenwords"]} language={language}/> : <h1>Loading...</h1>}
+                                <WordTable words={words_for_table} language={language}/>
                             </Grid>
                         </Grid>
                     </Paper>
@@ -106,6 +119,7 @@ function Words() {
                 </Box>          
             </PageTemplate>
         );
+
 }
 
 export default Words;
