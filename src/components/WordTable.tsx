@@ -14,13 +14,12 @@ import Paper from '@mui/material/Paper';
 interface Props {
   words: {
     english: string;
-    spanish: string; 
-    french: string;
-    russian: string;
-    italian: string;
-    japanese: string;
-    chinese: string;
-    examplesentence: string;
+    foreignword: string; 
+    examplesentence_english: string;
+    examplesentence_foreign: string;
+    english_definition: string;
+    foreign_definition: string;
+    audiofilelink: string;
   }[],
   language: string,
 };
