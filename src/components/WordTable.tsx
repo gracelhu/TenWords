@@ -70,7 +70,7 @@ export default function WordTable({words, language}: Props) {
                             <VolumeUpIcon />
                         </IconButton>
                     </TableCell> : <></>}
-                    <TableCell data-cy={"lang_word_"+(index+1)}>{word[language as keyof typeof word]}</TableCell>
+                    <TableCell data-cy={"lang_word_"+(index+1)}>{word.foreignword}</TableCell>
                     {canListen ? <TableCell>
                       <IconButton data-cy={"btn_speak_lang_"+(index+1)} color="primary"  onClick={() => handleClick(word.foreignword, language)}>
                           <VolumeUpIcon />
