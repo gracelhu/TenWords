@@ -98,7 +98,7 @@ function Words() {
                                 {languageDropDown}
                             </Select>
                         </FormControl>
-                        <h1 style={{textAlign: "center"}}>Packet 1: {date.toDateString()}</h1>
+                        <h1 style={{textAlign: "center"}}>Packet 1: {items["date"]}</h1>
                         <h2 data-testid="language-subtitle" style={{textAlign: "center"}}>10 Words in {upperCaseLanguage}</h2>
                         <Grid
                             container
