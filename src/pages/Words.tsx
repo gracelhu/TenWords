@@ -25,7 +25,7 @@ function Words() {
     const [language, setLanguage] = useState<string>("spanish");
     const [isLoaded, setLoaded] = useState(false);
     const [items, setItems] = useState<any>([]);
-
+    
     useEffect(() => {
         fetch("/api/words/"+language_code[language as keyof typeof language_code]+"/package/1")
         .then(res => res.json())
@@ -35,8 +35,13 @@ function Words() {
                 setLoaded(true);
             },
         )
-    });
-
+        .catch(error => {
+            console.log("Fetch error");
+            console.warn(error)
+        })
+    }
+    );
+    
     const languages = [
         "spanish",
         "french",
