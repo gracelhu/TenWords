@@ -12,11 +12,11 @@
   ### Cypress Tests
   - Sign-In Page
 	- Test entering login and submitting
-- Sign-Up Page
+  - Sign-Up Page
 	- Test entering login and submitting
-- Words Page
+  - Words Page
 	- Test that connection has been made to API
-- Word Table
+  - Word Table
 	- Test word translation matches up
 	- Test the word audio button
   
