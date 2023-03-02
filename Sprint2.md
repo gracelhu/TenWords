@@ -11,6 +11,8 @@
       - Ensure words are in passed in language (French)
   ### Cypress Tests
   
+### Backend Branck Link: https://github.com/gracelhu/TenWords/tree/sprint-2-backend
+
 ## Backend Unit Tests
 
 - func TestWord: Tests Word struct and its json components, checks whether it is compatible with the MongoDB Database. Test Data was sent to the Test Database and it was retrieved and compared with the original data and the test passes.
