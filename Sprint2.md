@@ -10,6 +10,15 @@
       - Ensure words are in passed in language (Italian)
       - Ensure words are in passed in language (French)
   ### Cypress Tests
+  - Sign-In Page
+	- Test entering login and submitting
+- Sign-Up Page
+	- Test entering login and submitting
+- Words Page
+	- Test that connection has been made to API
+- Word Table
+	- Test word translation matches up
+	- Test the word audio button
   
 ### Backend Branck Link: https://github.com/gracelhu/TenWords/tree/sprint-2-backend
 
