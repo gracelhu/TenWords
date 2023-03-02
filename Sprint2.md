@@ -13,6 +13,16 @@
   
 ## Backend Unit Tests
 
+- func TestWord: Tests Word struct and its json components, checks whether it is compatible with the MongoDB Database. Test Data was sent to the Test Database and it was retrieved and compared with the original data and the test passes.
+
+- func TestUpdateWordProgress: ProgressIndex tracks the number of words completed by the User and the MapDatetoIndex matches the date with the ProgressIndex to keep track of dates so that users can check their previous days' progress. The test function, tests whether the ProgressIndex is updated in the database every time the api is called.
+
+- func TestGetWord: Tests the route handler which sends a single word with all the required components.
+
+- func TestGetTenWordsByID: Tests the route handler which sends ten words with all the required components.
+
+
+
 ## Documentation for Backend API: 
 
  TenWords REST API Documentation
@@ -43,3 +53,17 @@ Get into the proper directory (restapi.go file), run “go build”, and run the
 To make an http GET request to fetch a 10-word package in one of the six language options, use the endpoint “http://localhost:8000/api/words/{languagecode}/package/{id}”
 To make an http GET request to fetch a single word in one of the six language options, use the endpoint “http://localhost:8000/api/words/{languagecode}/single/{id}”
 To make an http GET request to fetch a single word in one of the six language options, use the endpoint http://localhost:8000/api/words/{languagecode}/date/{date}
+
+## Details of MongoDB Database
+
+- The main thing we are tracking user's progress is by the ProgressIndex which signifies how many words they have completed. Everyday, the user gets a package of ten words and the index is updated by 10. 
+
+- The Database stores 2 things: First is the ProgressIndex itself so that it is not reset everytime the api is called. Second is a Map which has a Key of Date and a value of ProgressIndex, so that later frontend can access the ProgressIndex for previous dates easily.
+
+- In addition to inserting data, there is also retrieval functionality using the Find functionality. 
+
+- Everytime, the api is called and the updated ProgressIndex and Map values are pushed to MongoDB and all the previous data in the collection is printed to the console.
+
+
+<img width="416" alt="image" src="https://user-images.githubusercontent.com/92817486/222310526-adc79fb8-6ec1-419d-b4ba-3c749c8cd859.png">
+
