@@ -40,8 +40,7 @@ function Words() {
             console.log("Fetch error");
             console.warn(error)
         })
-    }
-    );
+    }, []);
     
     const languages = [
         "spanish",
