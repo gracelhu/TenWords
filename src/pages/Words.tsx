@@ -33,6 +33,7 @@ function Words() {
             (result) => {
                 setItems(result);
                 setLoaded(true);
+                console.log("this is frontend.")
             },
         )
         .catch(error => {
