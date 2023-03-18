@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, {useState, useEffect, useMemo} from 'react';
 import PageTemplate from '../pages/PageTemplate';
 import WordTable from '../components/WordTable';
 import { FlashcardArray } from "react-quizlet-flashcard";
@@ -12,7 +12,7 @@ import FormControl from '@mui/material/FormControl';
 import Paper from '@mui/material/Paper';
 import Box from '@mui/material/Box';
 
-function Words() {
+const Words = useMemo(() => {
 
     const language_code: { [key: string]: string } = {
         "spanish": "es",
@@ -125,6 +125,6 @@ function Words() {
             </PageTemplate>
         );
 
-}
+})
 
 export default Words;
