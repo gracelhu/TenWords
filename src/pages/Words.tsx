@@ -125,6 +125,6 @@ const Words = useMemo(() => {
             </PageTemplate>
         );
 
-})
+}, [])
 
 export default Words;
