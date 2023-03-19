@@ -43,7 +43,7 @@ const handleClick = (word: string, language: string) => {
     synthesis.speak(text);
 }
 
-export default function WordTable({words, language}: Props) {
+function WordTable({words, language}: Props) {
     
     const upperCaseLanguage = language[0].toUpperCase() + language.substring(1);
 
@@ -84,3 +84,5 @@ export default function WordTable({words, language}: Props) {
         </>
     );
 }
+
+export default React.memo(WordTable);

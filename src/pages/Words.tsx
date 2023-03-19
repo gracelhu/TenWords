@@ -34,14 +34,14 @@ function Words() {
             (result) => {
                 setItems(result);
                 setLoaded(true);
+                console.log("this is frontend.")
             },
         )
         .catch(error => {
             console.log("Fetch error");
             console.warn(error)
         })
-    }
-    );
+    }, []);
     
     const languages = [
         "spanish",
@@ -133,4 +133,4 @@ function Words() {
 
 }
 
-export default Words;
+export default React.memo(Words);
