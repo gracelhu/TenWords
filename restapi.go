@@ -26,7 +26,7 @@ var currentTime = time.Now()                                              //to g
 var t = translator.New()                                                  //Init translator
 var result, err = t.Translate("", "auto", "en")                           //Init result of translation
 var dictionaryapiURL = "https://api.dictionaryapi.dev/api/v2/entries/en/" //the word we're interested in fetching information for will be appended to this url
-//variables for params["id"], date, and map use in Mongodb
+// variables for params["id"], date, and map use in Mongodb
 var dateP = currentTime.Format("01-02-2006")
 var ProgressIndexP string
 var MapDatetoindex = make(map[string]string)
@@ -46,11 +46,13 @@ type TenWordPackage struct {
 	Tenwords []Word `json:"tenwords"`
 	Date     string `json:"date"` //in this format: 01-02-2006
 }
-//struct made for use in mongodb
+
+// struct made for use in mongodb
 type MongoField struct {
 	ProgressIndex string            `json:"ProgressIndex"`
 	Map           map[string]string `json:"map"`
 }
+
 /*
 This function will be called by the route handler functions to fetch a word's information, like its:
 definition, example sentence, audio file link, etc. This information is being fetched using a free
@@ -188,7 +190,8 @@ func getTenWordsByDate(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 }
-//Function that updates index after each api call
+
+// Function that updates index after each api call
 func updateWordProgress(progressIndex string) {
 	//mongo stuff
 	//Pushing data to mongodb
@@ -204,14 +207,18 @@ func updateWordProgress(progressIndex string) {
 	defer call()
 	col := client.Database("First_Database").Collection("First COllection3")
 	fmt.Println("Collection Type: ", reflect.TypeOf(col))
-	MapDatetoindex[dateP] = ProgressIndexP
+
+	//MapDatetoindex[dateP] = ProgressIndexP
+	/*So right now, when we're testing the api, we won't be making api calls on seperate days.
+	Therefore, since there can't be repeat days, the map will only store the first call made that day.
+	To work around this for testing purposes, we'll just store the ProgressIndexP as the key too */
+
+	MapDatetoindex[ProgressIndexP] = ProgressIndexP
 	fmt.Println("printmap:", MapDatetoindex, "in:", ProgressIndexP)
 	oneDoc := MongoField{
-		
+
 		ProgressIndex: ProgressIndexP,
 		Map:           MapDatetoindex,
-		
-
 	}
 
 	fmt.Println("oneDoc Type: ", reflect.TypeOf(oneDoc))
@@ -232,22 +239,22 @@ func updateWordProgress(progressIndex string) {
 
 	//end mongo
 	//retrieve mongodb data
-       filter := bson.M{"ProgressIndex": ProgressIndexP}
-       update := bson.M{"$set": bson.M{
-        "progressindex": progressIndex,
-       }}
+	filter := bson.M{"ProgressIndex": ProgressIndexP}
+	update := bson.M{"$set": bson.M{
+		"progressindex": progressIndex,
+	}}
 
-     _, errp := col.UpdateOne(context.Background(), filter, update)
-        if errp != nil {
-        log.Fatal(err)
-       }
+	_, errp := col.UpdateOne(context.Background(), filter, update)
+	if errp != nil {
+		log.Fatal(err)
+	}
 
-       fmt.Println("Word progress updated to: ", progressIndex)
+	fmt.Println("Word progress updated to: ", progressIndex)
 	cursor, err := col.Find(context.TODO(), bson.D{})
 	if err != nil {
 		panic(err)
 	}
-	
+
 	var results []MongoField
 	if err = cursor.All(context.TODO(), &results); err != nil {
 		panic(err)

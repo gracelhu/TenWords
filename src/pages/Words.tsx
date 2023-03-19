@@ -7,6 +7,7 @@ import Grid from '@mui/material/Grid';
 
 import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
+import Button from '@mui/material/Button';
 import Select, { SelectChangeEvent } from '@mui/material/Select';
 import FormControl from '@mui/material/FormControl';
 import Paper from '@mui/material/Paper';
@@ -25,9 +26,9 @@ function Words() {
     const [language, setLanguage] = useState<string>("spanish");
     const [isLoaded, setLoaded] = useState(false);
     const [items, setItems] = useState<any>([]);
-    
+    //const progressIndex = 11
     useEffect(() => {
-        fetch("/api/words/"+language_code[language as keyof typeof language_code]+"/package/1")
+        fetch("/api/words/"+language_code[language as keyof typeof language_code]+"/package/11")
         .then(res => res.json())
         .then(
             (result) => {
@@ -91,6 +92,11 @@ function Words() {
 
         return (
             <PageTemplate>
+                <Box textAlign='center'>
+                <Button variant='contained'>
+                Give me next Ten Word Package
+                </Button>
+                </Box>
                 <Box sx={{mt: "30px", ml: "10%", width: "80%"}}>
                     <Paper sx={{p: "20px"}}>
                         <FormControl sx={{ m: 3, minWidth: 200 }}>
