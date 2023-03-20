@@ -42,9 +42,19 @@ type Word struct {
 	Audiofilelink           string `json:"audiofilelink"`
 }
 
+type VocabWord struct {
+	Tenwords []Word `json:"tenvocabwords"`
+}
+
 type TenWordPackage struct {
 	Tenwords []Word `json:"tenwords"`
 	Date     string `json:"date"` //in this format: 01-02-2006
+}
+
+// only includes an array of the English words for the ten word package. This is for fast display of the
+// "preview" card (react mui card component with packet #, date, and english words on it)
+type TenWordVocabPackage struct {
+	TenwordsVocab []Word `json:"tenwordsvocab"`
 }
 
 // struct made for use in mongodb
@@ -106,38 +116,42 @@ func getTenWordsByID(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	params := mux.Vars(r)
 
-	//Loop through the words and find the one with the correct id
-	//the correct id for ten word packets: scalar * 10 + 1 --> 1, 11, 21, 31, 41, etc.
+	ProgressIndexP = params["id"]
+	updateWordProgress(params["id"])
+	index, _ := strconv.Atoi(params["id"])
+	var tenWords = TenWordPackage{allWords[index : index+10], currentTime.Format("01-02-2006")}
+	for i, tenworditem := range tenWords.Tenwords {
 
-	for index, item := range allWords {
-		if item.ID == params["id"] {
-			ProgressIndexP = params["id"]
-			updateWordProgress(params["id"])
-			var tenWords = TenWordPackage{allWords[index : index+10], currentTime.Format("01-02-2006")}
-			for i, tenworditem := range tenWords.Tenwords {
-
-				//Set the English_definition, Examplesentence_english, and Audiofilelink fields by calling
-				//the function getWordInfo
-				tenWords.Tenwords[i].English_definition = getWordInfo(tenWords.Tenwords[i].Word, "definition")
-				tenWords.Tenwords[i].Audiofilelink = getWordInfo(tenWords.Tenwords[i].Word, "audiofilelink")
-				tenWords.Tenwords[i].Examplesentence_english = getWordInfo(tenWords.Tenwords[i].Word, "examplesentence")
-				result, err = t.Translate(tenworditem.Word, "auto", params["languagecode"])
-				if err != nil {
-					panic(err)
-				}
-				tenWords.Tenwords[i].Foreignword = result.Text
-
-				result, _ = t.Translate(tenWords.Tenwords[i].English_definition, "auto", params["languagecode"])
-				tenWords.Tenwords[i].Foreign_definition = result.Text
-
-				result, _ = t.Translate(tenWords.Tenwords[i].Examplesentence_english, "auto", params["languagecode"])
-				tenWords.Tenwords[i].Examplesentence_foreign = result.Text
-			}
-			allPackages = append(allPackages, tenWords)
-			json.NewEncoder(w).Encode(tenWords)
-			return
+		//Set the English_definition, Examplesentence_english, and Audiofilelink fields by calling
+		//the function getWordInfo
+		tenWords.Tenwords[i].English_definition = getWordInfo(tenWords.Tenwords[i].Word, "definition")
+		tenWords.Tenwords[i].Audiofilelink = getWordInfo(tenWords.Tenwords[i].Word, "audiofilelink")
+		tenWords.Tenwords[i].Examplesentence_english = getWordInfo(tenWords.Tenwords[i].Word, "examplesentence")
+		result, err = t.Translate(tenworditem.Word, "auto", params["languagecode"])
+		if err != nil {
+			panic(err)
 		}
+		tenWords.Tenwords[i].Foreignword = result.Text
+
+		result, _ = t.Translate(tenWords.Tenwords[i].English_definition, "auto", params["languagecode"])
+		tenWords.Tenwords[i].Foreign_definition = result.Text
+
+		result, _ = t.Translate(tenWords.Tenwords[i].Examplesentence_english, "auto", params["languagecode"])
+		tenWords.Tenwords[i].Examplesentence_foreign = result.Text
 	}
+	allPackages = append(allPackages, tenWords)
+	json.NewEncoder(w).Encode(tenWords)
+}
+
+func getTenWordsVocabByID(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	params := mux.Vars(r)
+
+	index, _ := strconv.Atoi(params["id"])
+
+	var tenWordsVocab = TenWordVocabPackage{allWords[index : index+10]}
+	json.NewEncoder(w).Encode(tenWordsVocab)
+	json.NewEncoder(w).Encode(&TenWordVocabPackage{})
 }
 
 func getWord(w http.ResponseWriter, r *http.Request) {
@@ -283,11 +297,14 @@ func main() {
 		allWords = append(allWords, newWord)
 		index++
 	}
-
 	/* ===== Route Handlers ===== */
 
 	//Route Handler for fetching 10 word packages in each of the foreign languages by their starting index
 	r.HandleFunc("/api/words/{languagecode}/package/{id}", getTenWordsByID).Methods("GET")
+
+	//Route Handler for fetching 10 word packages (just the english vocab) in each of the foreign languages by their starting index
+	//Why is this route handler not working..???
+	r.HandleFunc("/api/words/package/vocab/{id}", getTenWordsVocabByID).Methods("GET")
 
 	//Route Handler for fetching a single word in each of the foreign languages by their index
 	r.HandleFunc("/api/words/{languagecode}/single/{id}", getWord).Methods("GET")
@@ -297,3 +314,39 @@ func main() {
 
 	log.Fatal(http.ListenAndServe(":8000", r))
 }
+
+/*w.Header().Set("Content-Type", "application/json")
+params := mux.Vars(r)
+
+//Loop through the words and find the one with the correct id
+//the correct id for ten word packets: scalar * 10 + 1 --> 1, 11, 21, 31, 41, etc.
+
+for index, item := range allWords {
+	if item.ID == params["id"] {
+		ProgressIndexP = params["id"]
+		updateWordProgress(params["id"])
+		var tenWords = TenWordPackage{allWords[index : index+10], currentTime.Format("01-02-2006")}
+		for i, tenworditem := range tenWords.Tenwords {
+
+			//Set the English_definition, Examplesentence_english, and Audiofilelink fields by calling
+			//the function getWordInfo
+			tenWords.Tenwords[i].English_definition = getWordInfo(tenWords.Tenwords[i].Word, "definition")
+			tenWords.Tenwords[i].Audiofilelink = getWordInfo(tenWords.Tenwords[i].Word, "audiofilelink")
+			tenWords.Tenwords[i].Examplesentence_english = getWordInfo(tenWords.Tenwords[i].Word, "examplesentence")
+			result, err = t.Translate(tenworditem.Word, "auto", params["languagecode"])
+			if err != nil {
+				panic(err)
+			}
+			tenWords.Tenwords[i].Foreignword = result.Text
+
+			result, _ = t.Translate(tenWords.Tenwords[i].English_definition, "auto", params["languagecode"])
+			tenWords.Tenwords[i].Foreign_definition = result.Text
+
+			result, _ = t.Translate(tenWords.Tenwords[i].Examplesentence_english, "auto", params["languagecode"])
+			tenWords.Tenwords[i].Examplesentence_foreign = result.Text
+		}
+		allPackages = append(allPackages, tenWords)
+		json.NewEncoder(w).Encode(tenWords)
+		return
+	}
+} */
