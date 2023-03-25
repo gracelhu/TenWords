@@ -10,7 +10,7 @@ import { useLocation } from 'react-router-dom';
 
 export default function Practice() {
 
-    let from_api = useLocation().state.words;
+    let from_api = useLocation().state.words || {"tenwords": [], "date": ""};
     const language = useLocation().state.language;
 
     const [text, setText] = useState(["", "", "", "", "", "", "", "", "", ""]);
@@ -25,7 +25,7 @@ export default function Practice() {
     }
 
     
-    let testingWords = from_api.map((word: any, i: number) =>
+    let testingWords = from_api["tenwords"].map((word: any, i: number) =>
         <>
         <p style = {{"color": clicked ? (incorrect.includes(i) ? "red" : "green") : "black"}}><b>{i + 1}. {word["english"]}</b></p>
         <TextField variant="standard" placeholder={word["english"] + " (translation)"} onChange={e => changeWord(e.target.value, i)}></TextField>
@@ -36,8 +36,8 @@ export default function Practice() {
         setClicked(true);
         setIncorrect([]);
         let wrong: number[] = [];
-        for (let i = 0; i < from_api.length; i++){
-            if (text[i] == from_api[i]["foreignword"]){
+        for (let i = 0; i < from_api["tenwords"].length; i++){
+            if (text[i] == from_api["tenwords"][i]["foreignword"]){
                 setCorrect(correct + 1);
             } else {
                 wrong.push(i);
