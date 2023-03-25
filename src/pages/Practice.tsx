@@ -51,7 +51,7 @@ export default function Practice() {
         <PageTemplate>
             <Card sx={{maxWidth: 500, m: 2, p: 10}}>
                     <h1>Test Your Knowledge!</h1>
-                    <p>Test your knowledge of the following words by taking the quiz for the word packet: {from_api["date"]}.</p>
+                    <p>Test your knowledge of the following words in {language} by taking the quiz for the word packet: {from_api["date"]}.</p>
                     <CardContent>
                         <ol>
                             {testingWords}
