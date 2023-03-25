@@ -119,7 +119,7 @@ func getTenWordsByID(w http.ResponseWriter, r *http.Request) {
 	ProgressIndexP = params["id"]
 	updateWordProgress(params["id"])
 	index, _ := strconv.Atoi(params["id"])
-	var tenWords = TenWordPackage{allWords[index : index+10], currentTime.Format("01-02-2006")}
+	var tenWords = TenWordPackage{allWords[index-1 : index+9], currentTime.Format("01-02-2006")}
 	for i, tenworditem := range tenWords.Tenwords {
 
 		//Set the English_definition, Examplesentence_english, and Audiofilelink fields by calling
