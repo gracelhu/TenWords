@@ -26,9 +26,9 @@ function Words() {
     const [language, setLanguage] = useState<string>("spanish");
     const [isLoaded, setLoaded] = useState(false);
     const [items, setItems] = useState<any>([]);
-    //const progressIndex = 11
+    let progressIndex = 1
     useEffect(() => {
-        fetch("/api/words/"+language_code[language as keyof typeof language_code]+"/package/11")
+        fetch("/api/words/"+language_code[language as keyof typeof language_code]+"/package/"+progressIndex)
         .then(res => res.json())
         .then(
             (result) => {
@@ -42,6 +42,10 @@ function Words() {
             console.warn(error)
         })
     }, []);
+
+    const test = () => {
+        progressIndex = progressIndex + 10;
+    }
     
     const languages = [
         "spanish",
@@ -93,7 +97,7 @@ function Words() {
         return (
             <PageTemplate>
                 <Box textAlign='center'>
-                <Button variant='contained'>
+                <Button onClick={test} variant='contained'>
                 Give me next Ten Word Package
                 </Button>
                 </Box>
