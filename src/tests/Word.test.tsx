@@ -3,6 +3,8 @@ import ReactDOM from 'react-dom';
 import {fireEvent, render, screen} from '@testing-library/react'
 import Words from '../pages/Words';
 import userEvent from '@testing-library/user-event';
+import { BrowserRouter } from 'react-router-dom';
+
 
 
 // Testing Words Page
@@ -16,10 +18,10 @@ const supported_languages = [
   "chinese"];
 
 test('Change Language Selection Adjusts Subtitle', () => {
-    const wordsPage = render(<Words />);
+    const wordsPage = render(<BrowserRouter><Words /></BrowserRouter>);
     for (let i = 0; i < supported_languages.length; i++){
       const language = supported_languages[i];
-      const selectBox = wordsPage.getByTestId('language-select');;
+      const selectBox = wordsPage.getByTestId('language-select');
       fireEvent.change(selectBox, {target: {"value": language}})
       const languageSubtitle = screen.getByTestId("language-subtitle");
       expect(languageSubtitle).toHaveTextContent(language[0].toUpperCase() + language.substring(1));
@@ -27,7 +29,7 @@ test('Change Language Selection Adjusts Subtitle', () => {
 });
 
 test('Change Language Selection Changes Words Table Component', () => {
-  const wordsPage = render(<Words />);
+  const wordsPage = render(<BrowserRouter><Words /></BrowserRouter>);
   for (let i = 0; i < supported_languages.length; i++){
     const language = supported_languages[i];
     const selectBox = wordsPage.getByTestId('language-select');;

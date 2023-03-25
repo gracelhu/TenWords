@@ -10,8 +10,9 @@ import { useLocation } from 'react-router-dom';
 
 export default function Practice() {
 
-    let from_api = useLocation().state.words || {"tenwords": [], "date": ""};
-    const language = useLocation().state.language;
+    const location = useLocation();
+    let from_api = (location.state !== null) ? location.state.words : {"tenwords": [], "date": ""};
+    const language = (location.state !== null) ? location.state.language : "";
 
     const [text, setText] = useState(["", "", "", "", "", "", "", "", "", ""]);
     const [correct, setCorrect] = useState(0);
@@ -50,13 +51,13 @@ export default function Practice() {
     return (
         <PageTemplate>
             <Card sx={{maxWidth: 500, m: 2, p: 10}}>
-                    <h1>Test Your Knowledge!</h1>
-                    <p>Test your knowledge of the following words in {language} by taking the quiz for the word packet: {from_api["date"]}.</p>
+                    <h1 data-testid="heading">Test Your Knowledge!</h1>
+                    <p data-testid="to-language">Test your knowledge of the following words in {language} by taking the quiz for the word packet: {from_api["date"]}.</p>
                     <CardContent>
                         <ol>
                             {testingWords}
                         </ol>
-                        {!clicked ? <p></p> : <h2>Your Score: {correct}/10</h2>}
+                        {!clicked ? <p></p> : <h2 data-testid="score">Your Score: {correct}/10</h2>}
                         <Button variant="contained" onClick={() => checkWords()}>Check</Button>
                     </CardContent>
             </Card>
