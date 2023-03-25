@@ -119,6 +119,7 @@ func getTenWordsByID(w http.ResponseWriter, r *http.Request) {
 	ProgressIndexP = params["id"]
 	updateWordProgress(params["id"])
 	index, _ := strconv.Atoi(params["id"])
+	//slices are zero indexed- not 1 indexed (starting from 0 not 1)
 	var tenWords = TenWordPackage{allWords[index-1 : index+9], currentTime.Format("01-02-2006")}
 	for i, tenworditem := range tenWords.Tenwords {
 
