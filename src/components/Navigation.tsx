@@ -16,10 +16,6 @@ export default function Navigation() {
             "path": "/words"
         },
         {
-            "name": "Practice",
-            "path": "/practice"
-        },
-        {
             "name": "Sign Up",
             "path": "/sign-up",
         },
