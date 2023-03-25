@@ -2,7 +2,7 @@ import React, {useState, useEffect} from 'react';
 import PageTemplate from '../pages/PageTemplate';
 import WordTable from '../components/WordTable';
 import { FlashcardArray } from "react-quizlet-flashcard";
-
+import {Link} from 'react-router-dom';
 import Grid from '@mui/material/Grid';
 
 import InputLabel from '@mui/material/InputLabel';
@@ -26,9 +26,9 @@ function Words() {
     const [language, setLanguage] = useState<string>("spanish");
     const [isLoaded, setLoaded] = useState(false);
     const [items, setItems] = useState<any>([]);
-    //const progressIndex = 11
+    const [progressIndex, setProgressIndex] = useState(1);
     useEffect(() => {
-        fetch("/api/words/"+language_code[language as keyof typeof language_code]+"/package/11")
+        fetch("/api/words/"+language_code[language as keyof typeof language_code]+"/package/"+progressIndex)
         .then(res => res.json())
         .then(
             (result) => {
@@ -41,7 +41,11 @@ function Words() {
             console.log("Fetch error");
             console.warn(error)
         })
-    }, []);
+    }, [progressIndex]);
+
+    const test = () => {
+        setProgressIndex(progressIndex + 10);
+    }
     
     const languages = [
         "spanish",
@@ -93,12 +97,13 @@ function Words() {
         return (
             <PageTemplate>
                 <Box textAlign='center'>
-                <Button variant='contained'>
+                <Button onClick={test} variant='contained'>
                 Give me next Ten Word Package
                 </Button>
                 </Box>
                 <Box sx={{mt: "30px", ml: "10%", width: "80%"}}>
                     <Paper sx={{p: "20px"}}>
+                        <Link to="/practice" state={{"words": items, "language": language}}><Button variant="contained">Take a Quiz</Button></Link>
                         <FormControl sx={{ m: 3, minWidth: 200 }}>
                             <InputLabel>Learning</InputLabel>
                             <Select
