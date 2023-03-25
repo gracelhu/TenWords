@@ -11,6 +11,7 @@ import SignIn from './pages/SignIn';
 import SignUp from './pages/SignUp';
 import Words from './pages/Words';
 import Welcome from './pages/Welcome';
+import Practice from './pages/Practice'
 
 
 function App() {
@@ -22,6 +23,7 @@ function App() {
         <Route path="/sign-in" element={<SignIn/>}></Route>
         <Route path="/sign-up" element={<SignUp/>}></Route>
         <Route path="/words" element={<Words/>}></Route>
+        <Route path="/practice" element={<Practice/>}></Route>
       </Routes>
       </ThemeProvider>
   );
