@@ -41,7 +41,7 @@ function Words() {
             console.log("Fetch error");
             console.warn(error)
         })
-    }, []);
+    }, [progressIndex]);
 
     const test = () => {
         setProgressIndex(progressIndex + 10);
