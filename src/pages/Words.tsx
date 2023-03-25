@@ -26,7 +26,7 @@ function Words() {
     const [language, setLanguage] = useState<string>("spanish");
     const [isLoaded, setLoaded] = useState(false);
     const [items, setItems] = useState<any>([]);
-    let progressIndex = 1
+    const [progressIndex, setProgressIndex] = useState(1);
     useEffect(() => {
         fetch("/api/words/"+language_code[language as keyof typeof language_code]+"/package/"+progressIndex)
         .then(res => res.json())
@@ -44,7 +44,7 @@ function Words() {
     }, []);
 
     const test = () => {
-        progressIndex = progressIndex + 10;
+        setProgressIndex(progressIndex + 10);
     }
     
     const languages = [
