@@ -353,7 +353,7 @@ func storeAuth(auth Auth) string {
 	for _, result := range results {
 		fmt.Printf("%+v\n", result)
 	}
-	var state string = "default"
+	var state string = "register"
 	//var username bool = false
 	for _, result := range results {
 		//encode, _ := json.Marshal(result)
@@ -369,19 +369,20 @@ func storeAuth(auth Auth) string {
 
 	//end retrieve
 	//end experiment
+	if (state != "invalid") {
+		result, insertErr := col.InsertOne(ctx, oneDoc)
+		if insertErr != nil {
+			fmt.Println("InsertONE Error:", insertErr)
+			os.Exit(1)
+		} else {
+			fmt.Println("InsertOne() result type: ", reflect.TypeOf(result))
+			fmt.Println("InsertOne() api result type: ", result)
 
-	result, insertErr := col.InsertOne(ctx, oneDoc)
-	if insertErr != nil {
-		fmt.Println("InsertONE Error:", insertErr)
-		os.Exit(1)
-	} else {
-		fmt.Println("InsertOne() result type: ", reflect.TypeOf(result))
-		fmt.Println("InsertOne() api result type: ", result)
+			newID := result.InsertedID
+			fmt.Println("InsertedOne(), newID", newID)
+			fmt.Println("InsertedOne(), newID type:", reflect.TypeOf(newID))
 
-		newID := result.InsertedID
-		fmt.Println("InsertedOne(), newID", newID)
-		fmt.Println("InsertedOne(), newID type:", reflect.TypeOf(newID))
-
+		}
 	}
 
 	return state;
