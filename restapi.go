@@ -78,12 +78,14 @@ func getWordInfo(word string, infoType string) string {
 	resp, err := http.Get(apiURL)
 	if err != nil {
 		// handle error
+		panic(err)
 	}
 	defer resp.Body.Close()
 
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		// handle error
+		panic(err)
 	}
 
 	var val []Words
@@ -227,7 +229,7 @@ func updateWordProgress(progressIndex string) {
 	Therefore, since there can't be repeat days, the map will only store the first call made that day.
 	To work around this for testing purposes, we'll just store the ProgressIndexP as the key too */
 
-	MapDatetoindex[ProgressIndexP] = ProgressIndexP
+	MapDatetoindex[dateP] = ProgressIndexP
 	fmt.Println("printmap:", MapDatetoindex, "in:", ProgressIndexP)
 	oneDoc := MongoField{
 
