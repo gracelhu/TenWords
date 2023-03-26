@@ -2,7 +2,7 @@ import React, {useState, useEffect} from 'react';
 import PageTemplate from '../pages/PageTemplate';
 import WordTable from '../components/WordTable';
 import { FlashcardArray } from "react-quizlet-flashcard";
-
+import {Link} from 'react-router-dom';
 import Grid from '@mui/material/Grid';
 
 import InputLabel from '@mui/material/InputLabel';
@@ -12,6 +12,8 @@ import Select, { SelectChangeEvent } from '@mui/material/Select';
 import FormControl from '@mui/material/FormControl';
 import Paper from '@mui/material/Paper';
 import Box from '@mui/material/Box';
+import ArrowCircleRightIcon from '@mui/icons-material/ArrowCircleRight';
+import ArrowCircleLeftIcon from '@mui/icons-material/ArrowCircleLeft';
 
 function Words() {
 
@@ -26,9 +28,11 @@ function Words() {
     const [language, setLanguage] = useState<string>("spanish");
     const [isLoaded, setLoaded] = useState(false);
     const [items, setItems] = useState<any>([]);
-    //const progressIndex = 11
+    const [progressIndex, setProgressIndex] = useState(1);
+    const [packageNumber, setPackageNumber] = useState(1);
+
     useEffect(() => {
-        fetch("/api/words/"+language_code[language as keyof typeof language_code]+"/package/11")
+        fetch("/api/words/"+language_code[language as keyof typeof language_code]+"/package/"+progressIndex)
         .then(res => res.json())
         .then(
             (result) => {
@@ -41,7 +45,30 @@ function Words() {
             console.log("Fetch error");
             console.warn(error)
         })
-    }, []);
+    }, [progressIndex]);
+
+    //for the toggle arrows 
+    const nextTenWordPackage = () => {
+        if(progressIndex <= 3036)
+        {
+            setProgressIndex(progressIndex + 10);
+            console.log("clicked right!");
+            console.log(packageNumber);
+            setPackageNumber(packageNumber + 1);
+            console.log(packageNumber);
+            //write code here to make the button momentarily change to gray when its clicked 
+        }
+    }
+
+    const previousTenWordPackage = () => {
+        if(progressIndex >= 11)
+        {
+            setProgressIndex(progressIndex - 1);
+            console.log("clicked left!");
+            setPackageNumber(packageNumber - 10);
+            //write code here to make the button momentarily change to gray when its clicked 
+        }
+    }
     
     const languages = [
         "spanish",
@@ -93,12 +120,19 @@ function Words() {
         return (
             <PageTemplate>
                 <Box textAlign='center'>
-                <Button variant='contained'>
-                Give me next Ten Word Package
-                </Button>
+                <h3 style={{textAlign: "center", color: "black"}}>Click arrows to toggle between different ten word packages</h3>
+                <ArrowCircleLeftIcon style={{transform: "scale(2)", color: "black", marginRight: "32px" }} onClick={previousTenWordPackage}></ArrowCircleLeftIcon>
+                <ArrowCircleRightIcon style={{transform: "scale(2)", color: "black", marginRight: "32px" }} onClick={nextTenWordPackage}></ArrowCircleRightIcon>
                 </Box>
                 <Box sx={{mt: "30px", ml: "10%", width: "80%"}}>
                     <Paper sx={{p: "20px"}}>
+                        <Link
+                            to="/practice"
+                            state={
+                                {"words": items, "language": language}
+                            }>
+                                <Button variant="contained">Take a Quiz</Button>
+                        </Link>
                         <FormControl sx={{ m: 3, minWidth: 200 }}>
                             <InputLabel>Learning</InputLabel>
                             <Select
@@ -109,7 +143,7 @@ function Words() {
                                 {languageDropDown}
                             </Select>
                         </FormControl>
-                        <h1 style={{textAlign: "center"}}>Packet 1: {items["date"]}</h1>
+                        <h1 style={{textAlign: "center"}}>{'Packet ' + packageNumber + ': '} {items["date"]}</h1>
                         <h2 data-testid="language-subtitle" style={{textAlign: "center"}}>10 Words in {upperCaseLanguage}</h2>
                         <Grid
                             container
