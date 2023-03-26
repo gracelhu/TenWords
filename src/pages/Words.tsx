@@ -47,6 +47,7 @@ function Words() {
         })
     }, [progressIndex]);
 
+    //for the toggle arrows 
     const nextTenWordPackage = () => {
         if(progressIndex <= 3036)
         {
