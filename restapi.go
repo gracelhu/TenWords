@@ -288,11 +288,11 @@ func updateWordProgress(progressIndex string) {
 // trying to make username and pass routehandler
 func getnameandpass(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
+	params := mux.Vars(r)
 
-	item := Auth{Username: "Aayesha2", Password: "testingdiff", Date: dateP, Map: MapNametoPass}
+	item := Auth{Username: params["username"], Password: params["password"], Date: dateP, Map: MapNametoPass}
 	storeAuth(item)
 	json.NewEncoder(w).Encode(item)
-
 }
 
 // making database for username and pass
@@ -414,9 +414,10 @@ func main() {
 
 	//Route Handler for fetching 10 word packages in each of the foreign languages by their date
 	r.HandleFunc("/api/words/{languagecode}/package/date/{date}", getTenWordsByDate).Methods("GET")
-	r.HandleFunc("/api/words/package/auth", getnameandpass).Methods("GET")
 
-
+	//Route Handler for authentication
+	r.HandleFunc("/auth/{username}/{password}", getnameandpass).Methods("GET")
+	
 	log.Fatal(http.ListenAndServe(":8000", r))
 }
 
