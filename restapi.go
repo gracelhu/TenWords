@@ -30,7 +30,7 @@ var dictionaryapiURL = "https://api.dictionaryapi.dev/api/v2/entries/en/" //the 
 var dateP = currentTime.Format("01-02-2006")
 var ProgressIndexP string
 var MapDatetoindex = make(map[string]string)
-
+var MapNametoPass = make(map[string]string)
 type Word struct {
 	ID                      string `json:"id"`
 	Word                    string `json:"english"`     //en
@@ -61,6 +61,12 @@ type TenWordVocabPackage struct {
 type MongoField struct {
 	ProgressIndex string            `json:"ProgressIndex"`
 	Map           map[string]string `json:"map"`
+}
+type Auth struct {
+	Username string            `json:"Username"`
+	Password string            `json:"Password"`
+	Date     string            `json:"date"` //in this format: 01-02-2006
+	Map      map[string]string `json:"map"`
 }
 
 /*
@@ -279,6 +285,102 @@ func updateWordProgress(progressIndex string) {
 	}
 	//end retrieve
 }
+// trying to make username and pass routehandler
+func getnameandpass(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	params := mux.Vars(r)
+
+	item := Auth{Username: params["username"], Password: params["password"], Date: dateP, Map: MapNametoPass}
+	storeAuth(item)
+	json.NewEncoder(w).Encode(item)
+}
+
+// making database for username and pass
+func storeAuth(auth Auth) {
+	//mongo stuff
+	//Pushing data to mongodb
+	clientOptions := options.Client().ApplyURI("mongodb://localhost:27017")
+	fmt.Println("ClientOptopm TYPE:", reflect.TypeOf(clientOptions))
+
+	client, err := mongo.Connect(context.TODO(), clientOptions)
+	if err != nil {
+		fmt.Println("Mongo.connect() ERROR: ", err)
+		os.Exit(1)
+	}
+	ctx, call := context.WithTimeout(context.Background(), 15*time.Second)
+	defer call()
+	col := client.Database("First_Database").Collection("AuthenticationDB")
+	fmt.Println("Collection Type: ", reflect.TypeOf(col))
+	MapNametoPass[auth.Username] = auth.Password
+	//fmt.Println("printmap:", MapDatetoindex, "in:", ProgressIndexP)
+	oneDoc := Auth{
+
+		Username: auth.Username,
+		Password: auth.Password,
+		Date:     auth.Date,
+		Map:      MapNametoPass,
+	}
+
+	fmt.Println("oneDoc Type: ", reflect.TypeOf(oneDoc))
+	//cutting and pasting new code
+	//retrieve mongodb data
+	filter := bson.M{"Username": auth.Username, "Password": auth.Password, "Date": auth.Date}
+	update := bson.M{"$set": bson.M{
+		"Username": auth.Username,
+		"password": auth.Password, "Date": auth.Date,
+	}}
+
+	_, errp := col.UpdateOne(context.Background(), filter, update)
+	if errp != nil {
+		log.Fatal(err)
+	}
+
+	//fmt.Println("Word progress updated to: ", progressIndex)
+	cursor, err := col.Find(context.TODO(), bson.D{})
+	if err != nil {
+		panic(err)
+	}
+
+	var results []Auth
+	if err = cursor.All(context.TODO(), &results); err != nil {
+		panic(err)
+	}
+	for _, result := range results {
+		fmt.Printf("%+v\n", result)
+	}
+	var found bool = false
+	//var username bool = false
+	for _, result := range results {
+		//encode, _ := json.Marshal(result)
+		if result.Username == auth.Username && result.Password == auth.Password {
+			found = true
+		}
+
+	}
+	if found {
+		fmt.Println("Returning User!")
+	} else {
+		fmt.Println("New User!!")
+	}
+	//end retrieve
+	//end experiment
+	result, insertErr := col.InsertOne(ctx, oneDoc)
+	if insertErr != nil {
+		fmt.Println("InsertONE Error:", insertErr)
+		os.Exit(1)
+	} else {
+		fmt.Println("InsertOne() result type: ", reflect.TypeOf(result))
+		fmt.Println("InsertOne() api result type: ", result)
+
+		newID := result.InsertedID
+		fmt.Println("InsertedOne(), newID", newID)
+		fmt.Println("InsertedOne(), newID type:", reflect.TypeOf(newID))
+
+	}
+
+	//end mongo
+
+}
 func main() {
 	r := mux.NewRouter() //Init Router
 
@@ -313,6 +415,9 @@ func main() {
 	//Route Handler for fetching 10 word packages in each of the foreign languages by their date
 	r.HandleFunc("/api/words/{languagecode}/package/date/{date}", getTenWordsByDate).Methods("GET")
 
+	//Route Handler for authentication
+	r.HandleFunc("/auth/{username}/{password}", getnameandpass).Methods("GET")
+	
 	log.Fatal(http.ListenAndServe(":8000", r))
 }
 
