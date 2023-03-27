@@ -63,7 +63,7 @@ function Words() {
     const previousTenWordPackage = () => {
         if(progressIndex >= 11)
         {
-            setProgressIndex(progressIndex - 1);
+            setProgressIndex(progressIndex - 10);
             console.log("clicked left!");
             setPackageNumber(packageNumber - 1);
             //write code here to make the button momentarily change to gray when its clicked 
