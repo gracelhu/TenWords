@@ -12,7 +12,6 @@ import (
 	"reflect"
 	"strconv"
 	"time"
-
 	translator "github.com/Conight/go-googletrans"
 	"github.com/gorilla/mux"
 	"go.mongodb.org/mongo-driver/bson"
@@ -68,6 +67,9 @@ type Auth struct {
 	Date     string            `json:"date"` //in this format: 01-02-2006
 	Map      map[string]string `json:"map"`
 }
+type AuthValidation struct {
+	State string				`json:"State"`
+}
 
 /*
 This function will be called by the route handler functions to fetch a word's information, like its:
@@ -84,12 +86,14 @@ func getWordInfo(word string, infoType string) string {
 	resp, err := http.Get(apiURL)
 	if err != nil {
 		// handle error
+		panic(err)
 	}
 	defer resp.Body.Close()
 
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		// handle error
+		panic(err)
 	}
 
 	var val []Words
@@ -234,7 +238,7 @@ func updateWordProgress(progressIndex string) {
 	Therefore, since there can't be repeat days, the map will only store the first call made that day.
 	To work around this for testing purposes, we'll just store the ProgressIndexP as the key too */
 
-	MapDatetoindex[ProgressIndexP] = ProgressIndexP
+	MapDatetoindex[dateP] = ProgressIndexP
 	fmt.Println("printmap:", MapDatetoindex, "in:", ProgressIndexP)
 	oneDoc := MongoField{
 
@@ -291,12 +295,14 @@ func getnameandpass(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 
 	item := Auth{Username: params["username"], Password: params["password"], Date: dateP, Map: MapNametoPass}
-	storeAuth(item)
-	json.NewEncoder(w).Encode(item)
+	//item := Auth{Username: "Aeyesha", Password: "password123", Date: dateP, Map: MapNametoPass}
+	var returnState = storeAuth(item)
+	ret := AuthValidation{State: returnState}
+	json.NewEncoder(w).Encode(ret)
 }
 
 // making database for username and pass
-func storeAuth(auth Auth) {
+func storeAuth(auth Auth) string {
 	//mongo stuff
 	//Pushing data to mongodb
 	clientOptions := options.Client().ApplyURI("mongodb://localhost:27017")
@@ -348,35 +354,39 @@ func storeAuth(auth Auth) {
 	for _, result := range results {
 		fmt.Printf("%+v\n", result)
 	}
-	var found bool = false
+	var state string = "register"
 	//var username bool = false
 	for _, result := range results {
 		//encode, _ := json.Marshal(result)
 		if result.Username == auth.Username && result.Password == auth.Password {
-			found = true
+			state = "returning"
+			fmt.Println("Returning user!")
+		} else if result.Username == auth.Username && result.Password != auth.Password {
+			state = "invalid"
+			fmt.Println("Invalid password error!")
 		}
 
 	}
-	if found {
-		fmt.Println("Returning User!")
-	} else {
-		fmt.Println("New User!!")
-	}
+
 	//end retrieve
 	//end experiment
-	result, insertErr := col.InsertOne(ctx, oneDoc)
-	if insertErr != nil {
-		fmt.Println("InsertONE Error:", insertErr)
-		os.Exit(1)
-	} else {
-		fmt.Println("InsertOne() result type: ", reflect.TypeOf(result))
-		fmt.Println("InsertOne() api result type: ", result)
+	if (state != "invalid") {
+		result, insertErr := col.InsertOne(ctx, oneDoc)
+		if insertErr != nil {
+			fmt.Println("InsertONE Error:", insertErr)
+			os.Exit(1)
+		} else {
+			fmt.Println("InsertOne() result type: ", reflect.TypeOf(result))
+			fmt.Println("InsertOne() api result type: ", result)
 
-		newID := result.InsertedID
-		fmt.Println("InsertedOne(), newID", newID)
-		fmt.Println("InsertedOne(), newID type:", reflect.TypeOf(newID))
+			newID := result.InsertedID
+			fmt.Println("InsertedOne(), newID", newID)
+			fmt.Println("InsertedOne(), newID type:", reflect.TypeOf(newID))
 
+		}
 	}
+
+	return state;
 
 	//end mongo
 
@@ -416,6 +426,7 @@ func main() {
 	r.HandleFunc("/api/words/{languagecode}/package/date/{date}", getTenWordsByDate).Methods("GET")
 
 	//Route Handler for authentication
+	//r.HandleFunc("/api/words/package/auth", getnameandpass).Methods("GET")
 	r.HandleFunc("/auth/{username}/{password}", getnameandpass).Methods("GET")
 	
 	log.Fatal(http.ListenAndServe(":8000", r))

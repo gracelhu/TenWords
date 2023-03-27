@@ -4,7 +4,8 @@
 /node_modules
 /.pnp
 .pnp.js
-
+/sqlite-3
+TenWords.code-workspace
 # testing
 /coverage
 

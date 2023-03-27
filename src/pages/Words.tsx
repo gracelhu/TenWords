@@ -127,12 +127,14 @@ function Words() {
                 <Box sx={{mt: "30px", ml: "10%", width: "80%"}}>
                     <Paper sx={{p: "20px"}}>
                         <Link
+                            style={{ textDecoration: 'none' }}
                             to="/practice"
                             state={
                                 {"words": items, "language": language}
                             }>
                                 <Button variant="contained">Take a Quiz</Button>
                         </Link>
+                        <br/>
                         <FormControl sx={{ m: 3, minWidth: 200 }}>
                             <InputLabel>Learning</InputLabel>
                             <Select
