@@ -65,7 +65,7 @@ function Words() {
         {
             setProgressIndex(progressIndex - 1);
             console.log("clicked left!");
-            setPackageNumber(packageNumber - 10);
+            setPackageNumber(packageNumber - 1);
             //write code here to make the button momentarily change to gray when its clicked 
         }
     }
