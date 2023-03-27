@@ -52,7 +52,7 @@ export default function Practice() {
         <PageTemplate>
             <Card sx={{maxWidth: 500, m: 2, p: 10}}>
                     <h1 data-testid="heading">Test Your Knowledge!</h1>
-                    <p data-testid="to-language">Test your knowledge of the following words in {language} by taking the quiz for the word packet: {from_api["date"]}.</p>
+                    <p data-testid="to-language"><span data-testid="subtitle">Test your knowledge of the following words by taking the quiz for the word packet:</span> {from_api["date"]}.</p>
                     <CardContent>
                         <ol>
                             {testingWords}

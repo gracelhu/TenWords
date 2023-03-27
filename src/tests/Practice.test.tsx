@@ -11,8 +11,8 @@ test('Practice correctly renders title', () => {
     expect(heading).toHaveTextContent("Test Your Knowledge!");
 });
 
-test('Practice correctly renders title', () => {
+test('Practice reveals practice instructions', () => {
     const practicePage = render(<BrowserRouter><Practice /></BrowserRouter>);
     const heading = practicePage.getByTestId('heading');
-    expect(heading).toHaveTextContent("Test Your Knowledge!");
+    expect(heading).toHaveTextContent("Test your knowledge of the following words by taking the quiz for the word packet:");
 });
