@@ -13,6 +13,6 @@ test('Practice correctly renders title', () => {
 
 test('Practice reveals practice instructions', () => {
     const practicePage = render(<BrowserRouter><Practice /></BrowserRouter>);
-    const heading = practicePage.getByTestId('subtitle');
-    expect(heading).toHaveTextContent("Test your knowledge of the following words by taking the quiz for the word packet:");
+    const subtitle = practicePage.getByTestId('subtitle');
+    expect(subtitle).toHaveTextContent("Test your knowledge of the following words by taking the quiz for the word packet:");
 });
