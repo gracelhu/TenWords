@@ -19,6 +19,6 @@ This Sprint, one of the core features added was the Practice feature. This featu
 #### Cypress Unit Tests
 
 
-### Backend
+## Backend
 ## Backend Unit Tests
 ### Updated Backend Documentation
