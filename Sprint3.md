@@ -22,7 +22,7 @@ Additionally, the frontend and backend connection was solidified this sprint. An
 
 
 ## Backend
-## Backend Unit Tests
+## Backend Unit Tests (filename: finaltest_test.go)
   - func TestUsername: Tests whether username is correctly updated in the database.
   - func TestPassword: Tests whether the password is correctly updated in the database.
   - func TestWord: Tests Word struct and its json components, checks whether it is compatible with the MongoDB Database. Test Data was sent to the Test Database and it was retrieved and compared with the original data and the test passes.
