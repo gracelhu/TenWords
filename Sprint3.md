@@ -84,14 +84,14 @@ Get into the proper directory (restapi.go file), run “go build”, and run the
 - To make an http GET request to fetch the username and password, use the endpoint "http://localhost:8000/api/words/package/auth"
 
 
-### Database Details
-#### How User is Authenticated
+#### Database Details
+##### How User is Authenticated
   - The data stored was the user's credentials, including their username and password. The date they are trying to login is also stored, along with a map which maps from username to password.
   - A validation state is determined depending on whether the user is new, returning, or invalid. To determine this, the database is searched for the exact match of the username to the password and if either is incorrect, then the state is set to invalid, if it is correct and found, then the state is set to "returning", and if it is new, then the state is "new".
   - The state is fetched by the frontend using a routehandler.
 
 
-#### How User Progress Data Is Stored
+##### How User Progress Data Is Stored
 - The main thing we are tracking user's progress is by the ProgressIndex which signifies how many words they have completed. The user gets a package of ten words and the index is updated by 10. 
 
 - The Database stores 2 things: First is the ProgressIndex itself so that it is not reset everytime the api is called. Second is a Map which has a Key of Date and a value of ProgressIndex, so that later frontend can access the ProgressIndex for previous dates easily.
