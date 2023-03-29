@@ -38,7 +38,7 @@ Link to Tests: https://github.com/gracelhu/TenWords/blob/sprint-3/finaltest_test
 
 
 
-## Backend Documentation (Updated)
+### Backend Documentation (Updated)
 
 #### REST API Documentation
 **Where does the TenWords REST API get the vocabulary words from?**
@@ -84,7 +84,7 @@ Get into the proper directory (restapi.go file), run “go build”, and run the
 - To make an http GET request to fetch the username and password, use the endpoint "http://localhost:8000/api/words/package/auth"
 
 
-## Database Details
+### Database Details
 #### How User is Authenticated
   - The data stored was the user's credentials, including their username and password. The date they are trying to login is also stored, along with a map which maps from username to password.
   - A validation state is determined depending on whether the user is new, returning, or invalid. To determine this, the database is searched for the exact match of the username to the password and if either is incorrect, then the state is set to invalid, if it is correct and found, then the state is set to "returning", and if it is new, then the state is "new".
