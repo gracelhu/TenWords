@@ -67,9 +67,13 @@ Example: r.HandleFunc("/api/words/package/auth", getnameandpass).Methods("GET")
 How to use the TenWords REST API?
 
 Get into the proper directory (restapi.go file), run “go build”, and run the generated executable (./executablename). The TenWords REST API is now running on port 8000. You can now make any necessary API calls.
+
 To make an http GET request to fetch a 10-word package in one of the six language options, use the endpoint “http://localhost:8000/api/words/{languagecode}/package/{id}”
+
 To make an http GET request to fetch a single word in one of the six language options, use the endpoint “http://localhost:8000/api/words/{languagecode}/single/{id}”
+
 To make an http GET request to fetch a single word in one of the six language options, use the endpoint http://localhost:8000/api/words/{languagecode}/date/{date}
+
 To make an http GET request to fetch the username and password, use the endpoint "http://localhost:8000/api/words/package/auth"
 
 
