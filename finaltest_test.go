@@ -1,21 +1,17 @@
 package main
 
 import (
-	"context"
 	"fmt"
-	"log"
 	"net/http"
 	"net/http/httptest"
 
 	"testing"
 
+	translator "github.com/Conight/go-googletrans"
 	"github.com/gorilla/mux"
-	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/mongo"
-	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-func TestUpdateWordProgress(t *testing.T) {
+/* func TestUpdateWordProgress(t *testing.T) {
 	// Connect to the test database
 	def := "testindex"
 	//updated:="testindex2"
@@ -306,49 +302,6 @@ func TestPassword(t *testing.T) {
 
 }
 
-func TestGetWord(t *testing.T) {
-	//var word Word
-	// Set up a mock request and response
-	//req, err := http.NewRequest("GET", "/api/words/en/single/22", nil)
-	req, err := http.NewRequest("GET", "/api/words/en/single/22", nil)
-	fmt.Println("req ", req)
-	if err != nil {
-		t.Fatal(err)
-	}
-	rr := httptest.NewRecorder()
-
-	// Create a test router and call the handler
-	router := mux.NewRouter()
-	router.HandleFunc("/api/words/{languagecode}/single/{id}", getWord)
-	//router.HandleFunc("/api/words/{languagecode}/single/{id}", getWord).Methods("GET")
-	router.ServeHTTP(rr, req)
-	//handler := http.HandlerFunc(getTenWordsByID)
-
-	//handler.ServeHTTP(rr, req)
-	// Verify the response
-	if status := rr.Code; status != http.StatusOK {
-		t.Errorf("handler returned wrong status code: got %v want %v",
-			status, http.StatusOK)
-	}
-
-	expected := `{
-		"id": "22",
-		"english": "surface",
-		"foreignword": "surface",
-		"examplesentence_english": "On the surface, the spy looked like a typical businessman.",
-		"examplesentence_foreign": "On the surface, the spy looked like a typical businessman.",
-		"english_definition": "The overside or up-side of a flat object such as a table, or of a liquid.",
-		"foreign_definition": "The overside or up-side of a flat object such as a table, or of a liquid.",
-		"audiofilelink": "https://api.dictionaryapi.dev/media/pronunciations/en/surface-us.mp3"
-	}`
-	if rr.Body.String() != expected {
-		t.Errorf("handler returned unexpected body: got %v want %v",
-			rr.Body.String(), expected)
-		fmt.Println("body: ", rr.Body.String())
-	}
-	log.Fatal(http.ListenAndServe(":8000", router))
-}
-
 func TestGetTenWordsByID(t *testing.T) {
 	// Set up a mock request and response
 	req, err := http.NewRequest("GET", "/api/words/en/package/1", nil)
@@ -482,4 +435,155 @@ func TestGetTenWordsByID(t *testing.T) {
 		fmt.Println("body: ", rr.Body.String())
 	}
 	//log.Fatal(http.ListenAndServe(":8000", router))
+}
+*/
+
+/* func TestGetWord(t *testing.T) {
+	req, err := http.NewRequest("GET", "/api/words/zh/single/11", nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	rr := httptest.NewRecorder()
+	handler := http.HandlerFunc(getWord)
+	handler.ServeHTTP(rr, req)
+	if status := rr.Code; status != http.StatusOK {
+		t.Errorf("handler returned wrong status code: got %v want %v",
+			status, http.StatusOK)
+	}
+
+	// Check the response body is what we expect.
+	expected := `{
+		"id": "11",
+		"english": "reveal",
+		"foreignword": "揭示",
+		"examplesentence_english": "The comedian had been telling us about his sleep being disturbed by noise. Then came the reveal: he was sleeping on a bed in a department store.",
+		"examplesentence_foreign": "喜剧演员一直告诉我们他的睡眠被噪音打扰了。然后揭露：他睡在一家百货公司的床上。",
+		"english_definition": "The outer side of a window or door frame; the jamb.",
+		"foreign_definition": "窗户或门框的外侧；门框。",
+		"audiofilelink": "https://api.dictionaryapi.dev/media/pronunciations/en/reveal-au.mp3"
+	}`
+
+	var bodyMap map[string]interface{}
+	if err := json.Unmarshal(rr.Body.Bytes(), &bodyMap); err != nil {
+		t.Errorf("failed to unmarshal response body: %v", err)
+	}
+
+	var expectedMap map[string]interface{}
+	if err := json.Unmarshal([]byte(expected), &expectedMap); err != nil {
+		t.Errorf("failed to unmarshal expected response body: %v", err)
+	}
+
+	if !reflect.DeepEqual(bodyMap, expectedMap) {
+		t.Errorf("handler returned unexpected body: got %v want %v",
+			bodyMap, expectedMap)
+	}
+} */
+
+/*func TestGetWord(t *testing.T) {
+
+	//pass this small slice (first ten words in allWords) into the request
+	mockWords := []Word{
+		{ID: "1", Word: "abandon"},
+		{ID: "2", Word: "sudden"},
+		{ID: "3", Word: "lawyer"},
+		{ID: "4", Word: "particularly"},
+		{ID: "5", Word: "gender"},
+		{ID: "6", Word: "literary"},
+		{ID: "7", Word: "cotton"},
+		{ID: "8", Word: "station"},
+		{ID: "9", Word: "everyone"},
+		{ID: "10", Word: "life"},
+	}
+
+	//var word Word
+	// Set up a mock request and response
+
+	req, err := http.NewRequest("GET", "/api/words/en/single/22", nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	rr := httptest.NewRecorder()
+
+	// Create a test router and call the handler
+	router := mux.NewRouter()
+	router.HandleFunc("/api/words/{languagecode}/single/{id}", getWord)
+
+	router.ServeHTTP(rr, req)
+
+	// Verify the response
+	if status := rr.Code; status != http.StatusOK {
+		t.Errorf("handler returned wrong status code: got %v want %v",
+			status, http.StatusOK)
+	}
+
+	expected := `{
+		"id": "22",
+		"english": "surface",
+		"foreignword": "surface",
+		"examplesentence_english": "On the surface, the spy looked like a typical businessman.",
+		"examplesentence_foreign": "On the surface, the spy looked like a typical businessman.",
+		"english_definition": "The overside or up-side of a flat object such as a table, or of a liquid.",
+		"foreign_definition": "The overside or up-side of a flat object such as a table, or of a liquid.",
+		"audiofilelink": "https://api.dictionaryapi.dev/media/pronunciations/en/surface-us.mp3"
+	}`
+
+	if rr.Body.String() != expected {
+		t.Errorf("handler returned unexpected body: got %v want %v",
+			rr.Body.String(), expected)
+		fmt.Println("body: ", rr.Body.String())
+	}
+
+} */
+
+func TestGetWord(t *testing.T) {
+	// Define the mockWords slice
+	mockWords := []Word{
+		{ID: "1", Word: "abandon"},
+		{ID: "2", Word: "sudden"},
+		{ID: "3", Word: "lawyer"},
+		{ID: "4", Word: "particularly"},
+		{ID: "5", Word: "gender"},
+		{ID: "6", Word: "literary"},
+		{ID: "7", Word: "cotton"},
+		{ID: "8", Word: "station"},
+		{ID: "9", Word: "everyone"},
+		{ID: "10", Word: "life"},
+	}
+
+	var trans = translator.New() //Init translator
+
+	// Create a closure that wraps the getWord function
+	handler := func(w http.ResponseWriter, r *http.Request) {
+		getWord(w, r, mockWords, trans)
+	}
+
+	// Set up the request
+	req, err := http.NewRequest("GET", "/api/words/zh/single/2", nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Set up the response recorder
+	rr := httptest.NewRecorder()
+
+	// Set up the router and register the closure as the handler
+	router := mux.NewRouter()
+	router.HandleFunc("/api/words/{languagecode}/single/{id}", handler)
+
+	// Make the request
+	router.ServeHTTP(rr, req)
+
+	// Verify the response
+	if status := rr.Code; status != http.StatusOK {
+		t.Errorf("handler returned wrong status code: got %v want %v",
+			status, http.StatusOK)
+	}
+
+	expected := `{"id":"2","english":"sudden","foreignword":"突然的","examplesentence_english":"The sudden drop in temperature left everyone cold and confused.","examplesentence_foreign":"突如其来的降温，让所有人都感到寒冷和迷茫。","english_definition":"An unexpected occurrence; a surprise.","foreign_definition":"意外事件；惊喜。","audiofilelink":"https://api.dictionaryapi.dev/media/pronunciations/en/sudden-us.mp3"}`
+
+	if rr.Body.String() != expected {
+		t.Errorf("handler returned unexpected body: got %v want %v",
+			rr.Body.String(), expected)
+		fmt.Println("body: ", rr.Body.String())
+	}
 }
