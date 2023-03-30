@@ -32,9 +32,11 @@ Link to Tests: https://github.com/gracelhu/TenWords/blob/sprint-3/finaltest_test
 
 - func TestUpdateWordProgress: ProgressIndex tracks the number of words completed by the User and the MapDatetoIndex matches the date with the ProgressIndex to keep track of dates so that users can check their previous days' progress. The test function, tests whether the ProgressIndex is updated in the database every time the api is called.
 
-- func TestGetWord: Tests the route handler which sends a single word with all the required components.
+- func TestGetChineseWord: Tests the route handler which sends a single word with all the required components. Uses Chinese as the language code.
 
-- func TestGetTenWordsByID: Tests the route handler which sends ten words with all the required components.
+- func TestGetSpanishWord: Tests the route handler which sends a single word with all the required components. Uses Spanish as the language code.
+
+- func TestGetTenWordsByID: Tests the route handler which sends ten words with all the required components. Uses Italian as the language code. 
 
 
 
