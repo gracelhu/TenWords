@@ -1,5 +1,10 @@
 package main
 
+//Problem I was running into before that I don't want to run into again:
+//If you made changes to this rest api, you should go build first, not just ./introtoSWE,
+//because the executable has an old version of the rest api saved. That's why postman
+//will show inaccurate response sometimes
+
 import (
 	"bufio"
 	"context"
