@@ -1,4 +1,3 @@
-
 # Sprint 3
 Link to Sprint 3 Branch: [https://github.com/gracelhu/TenWords/blob/sprint-3](https://github.com/gracelhu/TenWords/tree/sprint-3)
 
@@ -20,7 +19,8 @@ Link to Tests: https://github.com/gracelhu/TenWords/tree/sprint-3/src/tests
 #### Practice/Quiz Feature Component
   - Ensure that Quiz feature renders correctly by ensuring that quiz title/heading displays with accurate text reflecting topic of learning for user
   - Ensure that instructions for taking quiz/completing practice are shown to the user and enables them to understand what to do on Quiz page for all language selections
-Cypress:
+
+#### Cypress Unit Tests
 #### Word Table Component
   - Test that word table displays properly and elements work
   - Test that words are fetched within time
@@ -30,9 +30,6 @@ Cypress:
 #### Authentication Component (e2e)
   - Test that signing in with a stored username / password logs the user in properly and redirects
   - Test that attempting to sign in with an invalid username / password combination does not log the user in and does not redirect
-
-#### Cypress Unit Tests
-(TO BE FILLED IN -- LIST HERE!!!)
 
 ## Backend
 ### Backend Unit Tests
