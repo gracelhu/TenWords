@@ -120,6 +120,7 @@ function Words() {
         return (
             <PageTemplate>
                 <Box textAlign='center'>
+                <h3 data-cy="word_template"></h3>
                 <h3 style={{textAlign: "center", color: "black"}}>Click arrows to toggle between different ten word packages</h3>
                 <ArrowCircleLeftIcon style={{transform: "scale(2)", color: "black", marginRight: "32px" }} onClick={previousTenWordPackage}></ArrowCircleLeftIcon>
                 <ArrowCircleRightIcon style={{transform: "scale(2)", color: "black", marginRight: "32px" }} onClick={nextTenWordPackage}></ArrowCircleRightIcon>
@@ -170,3 +171,4 @@ function Words() {
 }
 
 export default React.memo(Words);
+

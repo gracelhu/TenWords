@@ -3,20 +3,49 @@ import PageTemplate from '../pages/PageTemplate';
 import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button'
 
+import { BrowserRouter } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { useRef, useState, useEffect } from 'react';
 
 export default function SignIn() {
 
+	//let navigate = useNavigate();
+	const sleep = (milliseconds: number) => {
+        return new Promise(resolve => setTimeout(resolve, milliseconds))
+    }
+
 	const [username, setUsername] = useState("");
-	const [password, setPassword] = useState(""); 
+	const [password, setPassword] = useState("");
+	const [message, setMessage] = useState("");
+    const [messageColor, setMessageColor] = useState("black");
 
 	const handleClick = async() => {
-		fetch("/auth/"+username+"/"+password)
+		fetch("http://localhost:3000/auth/"+username+"/"+password)
         .then(res => res.json())
         .then(
             (result) => {
                 console.log("Trying to login with " + username + ", " + password);
-				console.log(result);
+				console.log(result.State);
+                switch (result.State) {
+                    case 'invalid':
+                        setMessage("Error! Incorrect password!"); setMessageColor("red"); break;
+                    case 'returning':
+                        setMessage("Login successful! Redirecting..."); setMessageColor("black");
+						//sleep(1000).then(r => {
+							//history.replaceState(null, '', '/words');
+							//window.location.replace('/words');
+							//navigate('/words');
+						//})
+						let windowRef = window
+						setTimeout(() => {
+							windowRef.location.replace('http://localhost:3000/words')
+						})
+						break;
+                    case 'register':
+                        setMessage("Error! Username does not exist!"); setMessageColor("red"); break;
+                    default:
+                        setMessageColor("black");
+                }
             },
         )
         .catch(error => {
@@ -61,6 +90,9 @@ export default function SignIn() {
 			</Button>
 			
 			</div>
+
+			<br></br>
+            <h4 style={{color: messageColor, textAlign: "center"}} data-cy="auth_message">{message}</h4>
 			
         </PageTemplate>
     );
