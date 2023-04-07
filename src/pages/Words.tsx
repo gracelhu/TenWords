@@ -14,6 +14,7 @@ import Paper from '@mui/material/Paper';
 import Box from '@mui/material/Box';
 import ArrowCircleRightIcon from '@mui/icons-material/ArrowCircleRight';
 import ArrowCircleLeftIcon from '@mui/icons-material/ArrowCircleLeft';
+import { fontWeight } from '@mui/system';
 
 function Words() {
 
@@ -91,6 +92,15 @@ function Words() {
     const date = new Date(items["date"]);
     let flashcards = [];
     let words_for_table = [];
+
+    const boldWord = ( boldWord: string, sentence: string) => {
+        const listOfWords = sentence.split(" ");
+        let targetWord = boldWord.toLowerCase();
+        const shouldBeBold = (word: string) => {
+            return word.toLowerCase() === targetWord;
+        }
+        return listOfWords.map(word => <span style={{fontWeight: shouldBeBold(word) ? "bold" : "400", textDecoration: shouldBeBold(word) ? "underline" : "none"}}>{word + " "}</span>)
+    }
     
     if (isLoaded){
         words_for_table = items["tenwords"];
@@ -101,7 +111,9 @@ function Words() {
                     <Box width="100%"><h1>{words.english}</h1></Box>
                 </Grid>
                 <Grid item>
-                    <Box width="100%"><p>{words.examplesentence_english}</p></Box>
+                    <Box width="100%">
+                        <Box width="100%"><p>{boldWord(words.english, words.examplesentence_english)}</p></Box>
+                    </Box>
                 </Grid>
             </Grid>,
             backHTML: <Grid container sx={{ height: '100%' }} direction="column"  alignItems="center" justifyContent="center">
@@ -127,6 +139,7 @@ function Words() {
                 </Box>
                 <Box sx={{mt: "30px", ml: "10%", width: "80%"}}>
                     <Paper sx={{p: "20px"}}>
+                    {boldWord("olivia", "Hi! My name is Olivia")}
                         <Link
                             style={{ textDecoration: 'none' }}
                             to="/practice"
