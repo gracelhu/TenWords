@@ -139,7 +139,6 @@ function Words() {
                 </Box>
                 <Box sx={{mt: "30px", ml: "10%", width: "80%"}}>
                     <Paper sx={{p: "20px"}}>
-                    {boldWord("olivia", "Hi! My name is Olivia")}
                         <Link
                             style={{ textDecoration: 'none' }}
                             to="/practice"
