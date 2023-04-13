@@ -29,7 +29,13 @@ export default function Navigation() {
         <>
             <AppBar color="secondary" position="static">
                 <Toolbar>
-                    {routes.map((route, index) => (<Box sx={{mt: 2, mr: 5}} key={index} ><Button href={route.path} color="inherit">{route.name}</Button><Box sx={{m: 4}}/></Box>))}
+                    {
+                        routes.map((route, index) => (
+                            <Box sx={{mt: 2, mr: 5}} key={index} >
+                            <Button href={route.path} color="inherit">{route.name}</Button>
+                            <Box sx={{m: 4}}/></Box>
+                        ))
+                    }
                     <Box sx={{mr: 10}}></Box>
                 </Toolbar>
             </AppBar>
