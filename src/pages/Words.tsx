@@ -139,6 +139,9 @@ function Words() {
     const changeDate = (e: any) => {
         const date = (e.$m + 1) + "/" + e.$D + "/" + e.$y;
         setPacketDate(date);
+        console.log("test1");
+        console.log(date);
+        console.log("test2");
         fetch("/api/words/"+language_code[language as keyof typeof language_code]+"/package/"+date)
         .then(res => res.json())
         .then(

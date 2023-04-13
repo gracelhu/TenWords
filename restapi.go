@@ -404,11 +404,12 @@ func storeAuth(auth Auth) string {
 }
 func getquizprogress(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
+	params := mux.Vars(r)
 	err := beeep.Alert("TenWords", "Great job on finishing the quiz! You are ready to learn ten new words!", "tenwords.png")
 	if err != nil {
    	 panic(err)
 	}
-	item := QuizProgress{Username: "Aayesha2", Quiz: "5"}
+	item := QuizProgress{Username: params["username"], Quiz: params["quiznumber"]}
 	storeQuiz(item);
 	//storeAuth(item)
 	json.NewEncoder(w).Encode(item)
@@ -525,7 +526,7 @@ func main() {
 	//r.HandleFunc("/api/words/package/auth", getnameandpass).Methods("GET")
 	r.HandleFunc("/auth/{username}/{password}", getnameandpass).Methods("GET")
 	
-	r.HandleFunc("/quiz/{username}/{quiz}", getquizprogress).Methods("GET")
+	r.HandleFunc("/quiz/{username}/{quiznumber}", getquizprogress).Methods("GET")
 
 
 	log.Fatal(http.ListenAndServe(":8000", r))

@@ -32,22 +32,31 @@ export default function Practice() {
         </>
     );
 
-    const doBeep = async() => {
-		fetch("http://localhost:3000/quiz/eeee/1")
+    const trackQuizProgress = async(username : string, quiz : string) => {
+		fetch("http://localhost:3000/quiz/" + username + "/" + quiz)
 	}
 
     const checkWords = () => {
-        doBeep();
-        console.log("Funny beep");
         setClicked(true);
         setIncorrect([]);
         let wrong: number[] = [];
+        let correct = 0;
         for (let i = 0; i < from_api["tenwords"].length; i++){
             if (text[i] == from_api["tenwords"][i]["foreignword"]){
+                correct = correct + 1;
                 setCorrect(correct + 1);
             } else {
                 wrong.push(i);
                 setIncorrect(wrong);
+            }
+        }
+        if (correct == 10) {
+            const getusername = localStorage.getItem("username");
+            if (getusername != null) {
+                const upsertusername = JSON.parse(getusername);
+                trackQuizProgress(upsertusername, from_api["date"]);
+            } else {
+                console.log("username or password is null");
             }
         }
     }

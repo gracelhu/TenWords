@@ -8,6 +8,7 @@ import { useNavigate } from 'react-router-dom';
 import { useRef, useState, useEffect } from 'react';
 
 export default function SignIn() {
+	const navigate = useNavigate();
 
 	//let navigate = useNavigate();
 	const sleep = (milliseconds: number) => {
@@ -31,15 +32,18 @@ export default function SignIn() {
                         setMessage("Error! Incorrect password!"); setMessageColor("red"); break;
                     case 'returning':
                         setMessage("Login successful! Redirecting..."); setMessageColor("black");
-						//sleep(1000).then(r => {
-							//history.replaceState(null, '', '/words');
-							//window.location.replace('/words');
-							//navigate('/words');
-						//})
-						let windowRef = window
-						setTimeout(() => {
-							windowRef.location.replace('http://localhost:3000/words')
-						})
+
+						console.log("Trying to write " + username + ", " + password + " to browser storage");
+						localStorage.setItem("username", JSON.stringify(username));
+						localStorage.setItem("password", JSON.stringify(password));
+						
+						navigate('/words', {
+							state: {
+							  username,
+							  password
+							}
+						  });
+						
 						break;
                     case 'register':
                         setMessage("Error! Username does not exist!"); setMessageColor("red"); break;
