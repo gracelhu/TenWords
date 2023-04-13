@@ -451,7 +451,7 @@ func main() {
 	//r.HandleFunc("/api/words/package/auth", getnameandpass).Methods("GET")
 	r.HandleFunc("/auth/{username}/{password}", getnameandpass).Methods("GET")
 	
-	r.HandleFunc("/api/words/{username}/{quiz}", getquizprogress).Methods("GET")
+	r.HandleFunc("/quiz/{username}/{quiz}", getquizprogress).Methods("GET")
 
 
 	log.Fatal(http.ListenAndServe(":8000", r))
