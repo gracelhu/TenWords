@@ -23,6 +23,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
+	"github.com/gen2brain/beeep"
 )
 
 var allWords []Word                                                       //stores all words
@@ -399,7 +400,10 @@ func storeAuth(auth Auth) string {
 }
 func getquizprogress(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
-
+	err := beeep.Alert("Title", "Message body", "")
+	if err != nil {
+   	 panic(err)
+	}
 	item := QuizProgress{Username: "Aayesha2", Quiz: "5"}
 	//storeAuth(item)
 	json.NewEncoder(w).Encode(item)
