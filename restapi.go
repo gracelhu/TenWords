@@ -404,7 +404,7 @@ func storeAuth(auth Auth) string {
 }
 func getquizprogress(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
-	err := beeep.Alert("TenWords", "Great job on finishing the quiz! You are ready to learn ten new words!", "")
+	err := beeep.Alert("TenWords", "Great job on finishing the quiz! You are ready to learn ten new words!", "tenwords.png")
 	if err != nil {
    	 panic(err)
 	}
