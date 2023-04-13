@@ -15,6 +15,9 @@ import Box from '@mui/material/Box';
 import ArrowCircleRightIcon from '@mui/icons-material/ArrowCircleRight';
 import ArrowCircleLeftIcon from '@mui/icons-material/ArrowCircleLeft';
 import { fontWeight } from '@mui/system';
+import { DateTimePicker, DatePicker, LocalizationProvider } from '@mui/x-date-pickers';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import TextField from '@mui/material/TextField';
 
 function Words() {
 
@@ -31,6 +34,7 @@ function Words() {
     const [items, setItems] = useState<any>([]);
     const [progressIndex, setProgressIndex] = useState(1);
     const [packageNumber, setPackageNumber] = useState(1);
+    const [packetDate, setPacketDate] = useState("4/10/2023");
 
     useEffect(() => {
         fetch("/api/words/"+language_code[language as keyof typeof language_code]+"/package/"+progressIndex)
@@ -46,6 +50,9 @@ function Words() {
             console.log("Fetch error");
             console.warn(error)
         })
+
+        setPacketDate(items["date"]);
+
     }, [progressIndex]);
 
     //for the toggle arrows 
@@ -129,11 +136,41 @@ function Words() {
         );
     }
 
+    const changeDate = (e: any) => {
+        const date = (e.$m + 1) + "/" + e.$D + "/" + e.$y;
+        setPacketDate(date);
+        fetch("/api/words/"+language_code[language as keyof typeof language_code]+"/package/"+date)
+        .then(res => res.json())
+        .then(
+            (result) => {
+                setItems(result);
+                setLoaded(true);
+                console.log("this is frontend.")
+            },
+        )
+        .catch(error => {
+            console.log("Fetch error");
+            console.warn(error)
+        })
+    }
+
         return (
             <PageTemplate>
                 <Box textAlign='center'>
                 <h3 data-cy="word_template"></h3>
                 <h3 style={{textAlign: "center", color: "black"}}>Click arrows to toggle between different ten word packages</h3>
+                <LocalizationProvider dateAdapter={AdapterDayjs}>
+                    <DatePicker
+                        label="Select Packet Date"
+                        value={packetDate}
+                        onChange={(e) => changeDate(e)}
+                        renderInput={(props) => (
+                            <TextField {...props} />
+                          )}
+                    />
+                </LocalizationProvider>
+                <br/>
+                <br/>
                 <ArrowCircleLeftIcon style={{transform: "scale(2)", color: "black", marginRight: "32px" }} onClick={previousTenWordPackage}></ArrowCircleLeftIcon>
                 <ArrowCircleRightIcon style={{transform: "scale(2)", color: "black", marginRight: "32px" }} onClick={nextTenWordPackage}></ArrowCircleRightIcon>
                 </Box>
