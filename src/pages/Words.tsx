@@ -34,7 +34,7 @@ function Words() {
     const [items, setItems] = useState<any>([]);
     const [progressIndex, setProgressIndex] = useState(1);
     const [packageNumber, setPackageNumber] = useState(1);
-    const [packetDate, setPacketDate] = useState("4/10/2023");
+    const [packetDate, setPacketDate] = useState("4-10-2023");
 
     useEffect(() => {
         fetch("/api/words/"+language_code[language as keyof typeof language_code]+"/package/"+progressIndex)
@@ -137,22 +137,17 @@ function Words() {
     }
 
     const changeDate = (e: any) => {
-        const date = (e.$m + 1) + "/" + e.$D + "/" + e.$y;
+        const date = (e.$m + 1) + "-" + e.$D + "-" + e.$y;
         setPacketDate(date);
-        console.log("test1");
-        console.log(date);
-        console.log("test2");
         fetch("/api/words/"+language_code[language as keyof typeof language_code]+"/package/"+date)
         .then(res => res.json())
         .then(
             (result) => {
                 setItems(result);
                 setLoaded(true);
-                console.log("this is frontend.")
             },
         )
         .catch(error => {
-            console.log("Fetch error");
             console.warn(error)
         })
     }
