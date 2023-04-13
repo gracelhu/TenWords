@@ -78,7 +78,11 @@ type Auth struct {
 type AuthValidation struct {
 	State string `json:"State"`
 }
+type QuizProgress struct {
+	Username string            `json:"Username"`
+	Quiz     string             `json:"quiz"`
 
+}
 /*
 This function will be called by the route handler functions to fetch a word's information, like its:
 definition, example sentence, audio file link, etc. This information is being fetched using a free
