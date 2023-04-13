@@ -397,6 +397,13 @@ func storeAuth(auth Auth) string {
 	//end mongo
 
 }
+func getquizprogress(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+
+	item := QuizProgress{Username: "Aayesha2", Quiz: "5"}
+	//storeAuth(item)
+	json.NewEncoder(w).Encode(item)
+}
 func main() {
 	r := mux.NewRouter() //Init Router
 
@@ -439,6 +446,9 @@ func main() {
 	//Route Handler for authentication
 	//r.HandleFunc("/api/words/package/auth", getnameandpass).Methods("GET")
 	r.HandleFunc("/auth/{username}/{password}", getnameandpass).Methods("GET")
+	
+	r.HandleFunc("/api/words/package/quiz", getquizprogress).Methods("GET")
+
 
 	log.Fatal(http.ListenAndServe(":8000", r))
 }
