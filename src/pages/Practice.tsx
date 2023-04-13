@@ -7,7 +7,6 @@ import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
 import { useLocation } from 'react-router-dom';
 
-
 export default function Practice() {
 
     const location = useLocation();
@@ -33,7 +32,13 @@ export default function Practice() {
         </>
     );
 
+    const doBeep = async() => {
+		fetch("http://localhost:3000/quiz/eeee/1")
+	}
+
     const checkWords = () => {
+        doBeep();
+        console.log("Funny beep");
         setClicked(true);
         setIncorrect([]);
         let wrong: number[] = [];
@@ -50,7 +55,7 @@ export default function Practice() {
     
     return (
         <PageTemplate>
-            <Card sx={{maxWidth: 500, m: 2, p: 10}}>
+            <Card sx={{maxWidth: 500, m: 2, p: 10}} style={{textAlign: "center"}}>
                     <h1 data-testid="heading">Test Your Knowledge!</h1>
                     <p data-testid="to-language"><span data-testid="subtitle">Test your knowledge of the following words by taking the quiz for the word packet:</span> {from_api["date"]}.</p>
                     <CardContent>
