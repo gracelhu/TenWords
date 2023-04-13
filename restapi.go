@@ -405,8 +405,78 @@ func getquizprogress(w http.ResponseWriter, r *http.Request) {
    	 panic(err)
 	}
 	item := QuizProgress{Username: "Aayesha2", Quiz: "5"}
+	storeQuiz(item);
 	//storeAuth(item)
 	json.NewEncoder(w).Encode(item)
+}
+func storeQuiz(quiz QuizProgress) {
+	//mongo stuff
+	//Pushing data to mongodb
+	clientOptions := options.Client().ApplyURI("mongodb://localhost:27017")
+	fmt.Println("ClientOptopm TYPE:", reflect.TypeOf(clientOptions))
+
+	client, err := mongo.Connect(context.TODO(), clientOptions)
+	if err != nil {
+		fmt.Println("Mongo.connect() ERROR: ", err)
+		os.Exit(1)
+	}
+	ctx, call := context.WithTimeout(context.Background(), 15*time.Second)
+	defer call()
+	col := client.Database("First_Database").Collection("QuizDB")
+	fmt.Println("Collection Type: ", reflect.TypeOf(col))
+	
+	oneDoc := QuizProgress{
+
+		Username: quiz.Username,
+		Quiz: quiz.Quiz,
+		
+		
+	}
+
+	fmt.Println("oneDoc Type: ", reflect.TypeOf(oneDoc))
+	//cutting and pasting new code
+	//retrieve mongodb data
+	filter := bson.M{"Username": quiz.Username,  "Quiz": quiz.Quiz}
+	update := bson.M{"$set": bson.M{
+		"Username": quiz.Username,
+		"quiz": quiz.Quiz, 
+	}}
+
+	_, errp := col.UpdateOne(context.Background(), filter, update)
+	if errp != nil {
+		log.Fatal(err)
+	}
+
+	//fmt.Println("Word progress updated to: ", progressIndex)
+	cursor, err := col.Find(context.TODO(), bson.D{})
+	if err != nil {
+		panic(err)
+	}
+
+	var results []QuizProgress
+	if err = cursor.All(context.TODO(), &results); err != nil {
+		panic(err)
+	}
+	for _, result := range results {
+		fmt.Printf("%+v\n", result)
+	}
+	
+	result, insertErr := col.InsertOne(ctx, oneDoc)
+	if insertErr != nil {
+		fmt.Println("InsertONE Error:", insertErr)
+		os.Exit(1)
+	} else {
+		fmt.Println("InsertOne() result type: ", reflect.TypeOf(result))
+		fmt.Println("InsertOne() api result type: ", result)
+
+		newID := result.InsertedID
+		fmt.Println("InsertedOne(), newID", newID)
+		fmt.Println("InsertedOne(), newID type:", reflect.TypeOf(newID))
+
+	}
+
+	//end mongo
+
 }
 func main() {
 	r := mux.NewRouter() //Init Router
