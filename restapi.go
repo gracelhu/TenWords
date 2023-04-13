@@ -404,7 +404,7 @@ func storeAuth(auth Auth) string {
 }
 func getquizprogress(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
-	err := beeep.Alert("Title", "Message body", "")
+	err := beeep.Alert("TenWords", "Great job on finishing the quiz! You are ready to learn ten new words!", "")
 	if err != nil {
    	 panic(err)
 	}
@@ -451,7 +451,7 @@ func storeQuiz(quiz QuizProgress) {
 		log.Fatal(err)
 	}
 
-	//fmt.Println("Word progress updated to: ", progressIndex)
+	
 	cursor, err := col.Find(context.TODO(), bson.D{})
 	if err != nil {
 		panic(err)
