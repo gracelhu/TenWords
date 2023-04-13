@@ -32,8 +32,8 @@ export default function Practice() {
         </>
     );
 
-    const trackQuizProgress = async(username : string, quiz : string) => {
-		fetch("http://localhost:3000/quiz/" + username + "/" + quiz)
+    const trackQuizProgress = async(username : string, quiz : string, questioncount : number) => {
+		fetch("http://localhost:3000/quiz/" + username + "/" + quiz + "/" + questioncount);
 	}
 
     const checkWords = () => {
@@ -50,11 +50,11 @@ export default function Practice() {
                 setIncorrect(wrong);
             }
         }
-        if (correct == 10) {
+        if (correct >= 8) {
             const getusername = localStorage.getItem("username");
             if (getusername != null) {
                 const upsertusername = JSON.parse(getusername);
-                trackQuizProgress(upsertusername, from_api["date"]);
+                trackQuizProgress(upsertusername, from_api["date"], correct);
             } else {
                 console.log("username or password is null");
             }
