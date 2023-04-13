@@ -4,10 +4,10 @@ import { cyan, pink } from "@mui/material/colors";
 export const theme = createTheme({
   palette: {
     primary: {
-      main: '#3f50b5',
+      main: '#bed1cb',
     },
     secondary: {
-      main: '#ff8800',
+      main: '#a8104a',
     },
   },
 });
