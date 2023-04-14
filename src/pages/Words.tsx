@@ -133,7 +133,7 @@ function Words() {
                         <Box width="100%"><h1>{words.foreignword}</h1></Box>
                         </Grid>
                         <Grid item>
-                        <Box width="100%"><p>{{boldWord(words.foreignword, words.examplesentence_foreign)}}</p></Box>
+                        <Box width="100%"><p>{boldWord(words.foreignword, words.examplesentence_foreign)}</p></Box>
                         </Grid>
                     </Grid>
         }
