@@ -101,12 +101,17 @@ function Words() {
     let words_for_table = [];
 
     const boldWord = ( boldWord: string, sentence: string) => {
-        const listOfWords = sentence.split(" ");
-        let targetWord = boldWord.toLowerCase();
-        const shouldBeBold = (word: string) => {
-            return word.toLowerCase() === targetWord;
+        let index = sentence.indexOf(boldWord);
+        let listOfWords = sentence.split(boldWord);
+        if (listOfWords.length === 2){
+            return <p>{listOfWords[0]}<span style={{textDecoration: "underlined", fontWeight: "bold"}}>{boldWord}</span>{listOfWords[1]}</p>;
+        } else {
+            if (index === 0){
+                return <p><span style={{textDecoration: "underlined", fontWeight: "bold"}}>{boldWord}</span>{listOfWords[0]}</p>;
+            } else {
+                return <p>{listOfWords[0]}<span style={{textDecoration: "underlined", fontWeight: "bold"}}>{boldWord}</span></p>;
+            }
         }
-        return listOfWords.map(word => <span style={{fontWeight: shouldBeBold(word) ? "bold" : "400", textDecoration: shouldBeBold(word) ? "underline" : "none"}}>{word + " "}</span>)
     }
     
     if (isLoaded){
@@ -128,7 +133,7 @@ function Words() {
                         <Box width="100%"><h1>{words.foreignword}</h1></Box>
                         </Grid>
                         <Grid item>
-                        <Box width="100%"><p>{words.examplesentence_foreign}</p></Box>
+                        <Box width="100%"><p>{{boldWord(words.foreign, words.examplesentence_foreign)}}</p></Box>
                         </Grid>
                     </Grid>
         }
