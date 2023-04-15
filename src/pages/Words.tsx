@@ -147,8 +147,13 @@ function Words() {
 
     const changeDate = (e: any) => {
         const date = (e.$M + 1).toString().padStart(2,'0') + "-" + e.$D.toString().padStart(2,'0') + "-" + e.$y;
+        const daysBetween = new Date(date).getDate() - new Date('04-15-2023').getDate() + 1;
+        setPackageNumber(daysBetween);
+        console.log(date);
+        console.log(daysBetween);
         setPacketDate(date);
-        fetch("/api/words/"+language_code[language as keyof typeof language_code]+"/package/date/"+date)
+        //fetch("/api/words/"+language_code[language as keyof typeof language_code]+"/package/date/"+date)
+        fetch("/api/words/"+language_code[language as keyof typeof language_code]+"/package/"+daysBetween)
         .then(res => res.json())
         .then(
             (result) => {
@@ -202,7 +207,7 @@ function Words() {
                                 {languageDropDown}
                             </Select>
                         </FormControl>
-                        <h1 style={{textAlign: "center"}}>{'Packet ' + packageNumber + ': '} {items["date"]}</h1>
+                        <h1 style={{textAlign: "center"}}>{'Packet ' + packageNumber + ': '} {packetDate}</h1>
                         <h2 data-testid="language-subtitle" style={{textAlign: "center"}}>10 Words in {upperCaseLanguage}</h2>
                         <Grid
                             container
