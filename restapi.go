@@ -19,11 +19,11 @@ import (
 	"time"
 
 	translator "github.com/Conight/go-googletrans"
+	"github.com/gen2brain/beeep"
 	"github.com/gorilla/mux"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
-	"github.com/gen2brain/beeep"
 )
 
 var allWords []Word                                                       //stores all words
@@ -79,10 +79,10 @@ type AuthValidation struct {
 	State string `json:"State"`
 }
 type QuizProgress struct {
-	Username string            `json:"Username"`
-	Quiz     string             `json:"quiz"`
-
+	Username string `json:"Username"`
+	Quiz     string `json:"quiz"`
 }
+
 /*
 This function will be called by the route handler functions to fetch a word's information, like its:
 definition, example sentence, audio file link, etc. This information is being fetched using a free
@@ -407,13 +407,14 @@ func getquizprogress(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 	err := beeep.Alert("TenWords", "Great job on finishing the quiz! You are ready to learn ten new words!", "tenwords.png")
 	if err != nil {
-   	 panic(err)
+		panic(err)
 	}
 	item := QuizProgress{Username: params["username"], Quiz: params["quiznumber"]}
-	storeQuiz(item);
+	storeQuiz(item)
 	//storeAuth(item)
 	json.NewEncoder(w).Encode(item)
 }
+
 func storeQuiz(quiz QuizProgress) {
 	//mongo stuff
 	//Pushing data to mongodb
@@ -429,22 +430,20 @@ func storeQuiz(quiz QuizProgress) {
 	defer call()
 	col := client.Database("First_Database").Collection("QuizDB")
 	fmt.Println("Collection Type: ", reflect.TypeOf(col))
-	
+
 	oneDoc := QuizProgress{
 
 		Username: quiz.Username,
-		Quiz: quiz.Quiz,
-		
-		
+		Quiz:     quiz.Quiz,
 	}
 
 	fmt.Println("oneDoc Type: ", reflect.TypeOf(oneDoc))
 	//cutting and pasting new code
 	//retrieve mongodb data
-	filter := bson.M{"Username": quiz.Username,  "Quiz": quiz.Quiz}
+	filter := bson.M{"Username": quiz.Username, "Quiz": quiz.Quiz}
 	update := bson.M{"$set": bson.M{
 		"Username": quiz.Username,
-		"quiz": quiz.Quiz, 
+		"quiz":     quiz.Quiz,
 	}}
 
 	_, errp := col.UpdateOne(context.Background(), filter, update)
@@ -452,7 +451,6 @@ func storeQuiz(quiz QuizProgress) {
 		log.Fatal(err)
 	}
 
-	
 	cursor, err := col.Find(context.TODO(), bson.D{})
 	if err != nil {
 		panic(err)
@@ -465,7 +463,7 @@ func storeQuiz(quiz QuizProgress) {
 	for _, result := range results {
 		fmt.Printf("%+v\n", result)
 	}
-	
+
 	result, insertErr := col.InsertOne(ctx, oneDoc)
 	if insertErr != nil {
 		fmt.Println("InsertONE Error:", insertErr)
@@ -525,9 +523,10 @@ func main() {
 	//Route Handler for authentication
 	//r.HandleFunc("/api/words/package/auth", getnameandpass).Methods("GET")
 	r.HandleFunc("/auth/{username}/{password}", getnameandpass).Methods("GET")
-	
+
 	r.HandleFunc("/quiz/{username}/{quiznumber}", getquizprogress).Methods("GET")
 
+	//r.HandleFunc("/startdate/{username}/{quiznumber}", getstartdate).Methods("GET")
 
 	log.Fatal(http.ListenAndServe(":8000", r))
 }
