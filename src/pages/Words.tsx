@@ -103,14 +103,18 @@ function Words() {
     const boldWord = ( boldWord: string, sentence: string) => {
         let index = sentence.indexOf(boldWord);
         let listOfWords = sentence.split(boldWord);
-        if (listOfWords.length === 2){
-            return <p>{listOfWords[0]}<span style={{textDecoration: "underlined", fontWeight: "bold"}}>{boldWord}</span>{listOfWords[1]}</p>;
-        } else {
-            if (index === 0){
-                return <p><span style={{textDecoration: "underlined", fontWeight: "bold"}}>{boldWord}</span>{listOfWords[0]}</p>;
+        if (sentence.includes(boldWord)){
+            if (listOfWords.length === 2){
+                return <p>{listOfWords[0]}<span style={{textDecoration: "underlined", fontWeight: "bold"}}>{boldWord}</span>{listOfWords[1]}</p>;
             } else {
-                return <p>{listOfWords[0]}<span style={{textDecoration: "underlined", fontWeight: "bold"}}>{boldWord}</span></p>;
+                if (index === 0){
+                    return <p><span style={{textDecoration: "underlined", fontWeight: "bold"}}>{boldWord}</span>{listOfWords[0]}</p>;
+                } else {
+                    return <p>{listOfWords[0]}<span style={{textDecoration: "underlined", fontWeight: "bold"}}>{boldWord}</span></p>;
+                }
             }
+        } else {
+            return <p>{listOfWords[0]}</p>;
         }
     }
     
