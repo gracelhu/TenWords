@@ -397,7 +397,7 @@ func storeAuth(auth Auth) string {
 		}
 	}
 
-	return state
+	return state + "|" + auth.Date
 
 	//end mongo
 

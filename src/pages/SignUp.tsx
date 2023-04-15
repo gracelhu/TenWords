@@ -23,15 +23,21 @@ export default function SignUp() {
         .then(res => res.json())
         .then(
             (result) => {
+                let stateAndDate = result.State.split("|");
+				let state = stateAndDate[0];
+				let date = stateAndDate[1];
                 console.log("Trying to sign up with " + username + ", " + password);
-				console.log(result.State);
-                switch (result.State) {
+				console.log(state);
+                switch (state) {
                     case 'invalid':
                         setMessage("Error! Username already taken"); setMessageColor("red"); break;
                     case 'returning':
                         setMessage("Error! Username already taken"); setMessageColor("red"); break;
                     case 'register':
                         setMessage("Registered successfully! Redirecting..."); setMessageColor("black");
+                        localStorage.setItem("username", JSON.stringify(username));
+						localStorage.setItem("password", JSON.stringify(password));
+						localStorage.setItem("date", JSON.stringify(date));
                         sleep(1000).then(r => {
 							window.location.replace('/words');
                             //navigate('/words');

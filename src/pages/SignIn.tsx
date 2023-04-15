@@ -25,9 +25,12 @@ export default function SignIn() {
         .then(res => res.json())
         .then(
             (result) => {
+				let stateAndDate = result.State.split("|");
+				let state = stateAndDate[0];
+				let date = stateAndDate[1];
                 console.log("Trying to login with " + username + ", " + password);
-				console.log(result.State);
-                switch (result.State) {
+				console.log(state);
+                switch (state) {
                     case 'invalid':
                         setMessage("Error! Incorrect password!"); setMessageColor("red"); break;
                     case 'returning':
@@ -36,7 +39,8 @@ export default function SignIn() {
 						console.log("Trying to write " + username + ", " + password + " to browser storage");
 						localStorage.setItem("username", JSON.stringify(username));
 						localStorage.setItem("password", JSON.stringify(password));
-						
+						localStorage.setItem("date", JSON.stringify(date));
+
 						navigate('/words', {
 							state: {
 							  username,
