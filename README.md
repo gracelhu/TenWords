@@ -1,5 +1,14 @@
-# introtoSWE
-Group project for introduction to software engineering 
+# TenWords Language Learning App
+
+Available in six languages:
+Spanish 
+French
+Russian
+Italian
+Japanese
+Chinese
+
+Group project for Introduction to Software Engineering at the University of Florida 
 
 Back-end team:
 Grace Hu,
