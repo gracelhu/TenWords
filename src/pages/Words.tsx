@@ -146,7 +146,10 @@ function Words() {
     }
 
     const changeDate = (e: any) => {
-        const original_date = localStorage.getItem("date");
+        let original_date = localStorage.getItem("date");
+        if (original_date === null){
+            original_date = "04-15-2023"
+        }
         const date = (e.$M + 1).toString().padStart(2,'0') + "-" + e.$D.toString().padStart(2,'0') + "-" + e.$y;
         const daysBetween = new Date(date).getDate() - new Date(original_date).getDate() + 1;
         setPackageNumber(daysBetween);
