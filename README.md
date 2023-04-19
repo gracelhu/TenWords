@@ -1,7 +1,9 @@
 # TenWords Language Learning App
 
+Use the app here! https://tenwords.netlify.app/words
+
 Available in six languages:
-Spanish 
+Spanish
 French
 Russian
 Italian
