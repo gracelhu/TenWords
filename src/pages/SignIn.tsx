@@ -4,13 +4,9 @@ import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button'
 
 import { BrowserRouter } from 'react-router-dom';
-import { useNavigate } from 'react-router-dom';
 import { useRef, useState, useEffect } from 'react';
 
 export default function SignIn() {
-	const navigate = useNavigate();
-
-	//let navigate = useNavigate();
 	const sleep = (milliseconds: number) => {
         return new Promise(resolve => setTimeout(resolve, milliseconds))
     }
@@ -41,13 +37,9 @@ export default function SignIn() {
 						localStorage.setItem("password", JSON.stringify(password));
 						localStorage.setItem("date", JSON.stringify(date));
 
-						navigate('/words', {
-							state: {
-							  username,
-							  password,
-							  date
-							}
-						  });
+						sleep(1000).then(r => {
+							window.location.href = "/words";
+						})
 						
 						break;
                     case 'register':

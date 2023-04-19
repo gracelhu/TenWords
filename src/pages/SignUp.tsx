@@ -39,8 +39,7 @@ export default function SignUp() {
 						localStorage.setItem("password", JSON.stringify(password));
 						localStorage.setItem("date", JSON.stringify(date));
                         sleep(1000).then(r => {
-							window.location.replace('/words');
-                            //navigate('/words');
+							window.location.href = "/words";
 						})
                         break;
                     default:
