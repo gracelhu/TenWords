@@ -284,7 +284,7 @@ func updateWordProgress(progressIndex string) {
 		log.Fatal(err)
 	}
 
-	fmt.Println("Word progress updated to: ", progressIndex)
+	//fmt.Println("Word progress updated to: ", progressIndex)
 	cursor, err := col.Find(context.TODO(), bson.D{})
 	if err != nil {
 		panic(err)
@@ -294,9 +294,9 @@ func updateWordProgress(progressIndex string) {
 	if err = cursor.All(context.TODO(), &results); err != nil {
 		panic(err)
 	}
-	for _, result := range results {
-		fmt.Printf("%+v\n", result)
-	}
+	//for _, result := range results {
+		//fmt.Printf("%+v\n", result)
+	//}
 	//end retrieve
 }
 
@@ -344,7 +344,8 @@ func storeAuth(auth Auth) string {
 	filter := bson.M{"Username": auth.Username, "Password": auth.Password, "Date": auth.Date}
 	update := bson.M{"$set": bson.M{
 		"Username": auth.Username,
-		"password": auth.Password, "Date": auth.Date,
+		"Password": auth.Password,
+		"Date": auth.Date,
 	}}
 
 	_, errp := col.UpdateOne(context.Background(), filter, update)
@@ -363,13 +364,16 @@ func storeAuth(auth Auth) string {
 		panic(err)
 	}
 	for _, result := range results {
-		fmt.Printf("%+v\n", result)
+		fmt.Printf("%+v\n", result.Username);
+		fmt.Printf("%+v\n", result.Password);
+		fmt.Printf("%+v\n", result.Date);
 	}
 	var state string = "register"
 	//var username bool = false
 	for _, result := range results {
 		//encode, _ := json.Marshal(result)
 		if result.Username == auth.Username && result.Password == auth.Password {
+			auth.Date = result.Date;
 			state = "returning"
 			fmt.Println("Returning user!")
 		} else if result.Username == auth.Username && result.Password != auth.Password {
@@ -381,8 +385,10 @@ func storeAuth(auth Auth) string {
 
 	//end retrieve
 	//end experiment
-	if state != "invalid" {
+	if state == "register" {
 		result, insertErr := col.InsertOne(ctx, oneDoc)
+		fmt.Printf(results[len(results)-1].Date);
+		auth.Date = results[len(results)-1].Date;
 		if insertErr != nil {
 			fmt.Println("InsertONE Error:", insertErr)
 			os.Exit(1)
@@ -396,6 +402,10 @@ func storeAuth(auth Auth) string {
 
 		}
 	}
+
+	
+	//fmt.Println(auth.Date);
+
 
 	return state + "|" + auth.Date
 

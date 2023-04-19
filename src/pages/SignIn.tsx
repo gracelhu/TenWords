@@ -44,7 +44,8 @@ export default function SignIn() {
 						navigate('/words', {
 							state: {
 							  username,
-							  password
+							  password,
+							  date
 							}
 						  });
 						

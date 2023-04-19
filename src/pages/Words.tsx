@@ -140,6 +140,7 @@ function Words() {
     }
 
     let original_date = localStorage.getItem("date");
+    console.log("original date = " + original_date);
     let default_date = new Date().getMonth() + 1 + "-" + new Date().getDate() + "-" + new Date().getFullYear();
     if (original_date === null || original_date === undefined){
         original_date = default_date;
@@ -178,7 +179,8 @@ function Words() {
                         <DatePicker
                             label="Select Packet Date"
                             value={packetDate}
-                            minDate={default_date}
+                            minDate={original_date}
+                            maxDate={default_date}
                             onChange={(e) => changeDate(e)}
                             renderInput={(props) => (
                                 <TextField {...props} />
