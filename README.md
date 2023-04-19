@@ -28,7 +28,7 @@ Project Description:  TenWords is a language-learning web application that allow
 To run the application, clone the repository.
 `cd` into the directory in which you've cloned the repository.
 - Type `npm install` to install dependencies for the frontend project
-- Type  `go build`
-- Type `./introToSWE` to run the backend application
+- Type `npm run start` to run the frontend application 
+- Type  `go build` and then `./introtoSWE` to run the backend application
 
 Go to `http://localhost:3000` to interact with the application.
