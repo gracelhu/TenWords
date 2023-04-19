@@ -416,17 +416,16 @@ func storeAuth(auth Auth) string {
 func getquizprogress(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	params := mux.Vars(r)
-	/*
 	err := beeep.Beep(beeep.DefaultFreq, beeep.DefaultDuration)
 	if err != nil {
 		panic(err)
 	}
-	*/
-	err := beeep.Notify("TenWords", "Great job on finishing the quiz! You are ready to learn ten new words!", "tenwords.png")
+	/*
+	err := beeep.Alert("TenWords", "Great job on finishing the quiz! You are ready to learn ten new words!", "")
 	if err != nil {
 		panic(err)
 	}
-	
+	*/
 	fmt.Printf("Test running quiz progress")
 	item := QuizProgress{Username: params["username"], Quiz: params["quiznumber"], QuestionCount: params["questioncount"]}
 	storeQuiz(item)

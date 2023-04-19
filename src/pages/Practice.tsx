@@ -33,7 +33,7 @@ export default function Practice() {
     );
 
     const trackQuizProgress = async(username : string, quiz : string, questioncount : number) => {
-        console.log("Bla bla ablabla abllabla");
+        alert("Congrats! You successfully completed " + questioncount + " questions!")
 		fetch("http://localhost:3000/quiz/" + username + "/" + quiz + "/" + questioncount);
 	}
 
@@ -45,13 +45,13 @@ export default function Practice() {
         for (let i = 0; i < from_api["tenwords"].length; i++){
             if (text[i] == from_api["tenwords"][i]["foreignword"]){
                 correct = correct + 1;
-                setCorrect(correct + 1);
+                setCorrect(correct);
             } else {
                 wrong.push(i);
                 setIncorrect(wrong);
             }
         }
-        if (correct >= 1) {
+        if (correct >= 8) {
             const getusername = localStorage.getItem("username");
             if (getusername != null) {
                 const upsertusername = JSON.parse(getusername);
