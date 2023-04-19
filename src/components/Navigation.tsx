@@ -29,7 +29,7 @@ export default function Navigation() {
                         <Button href="/sign-up" color="inherit">Sign Up</Button>
                         
                     </> : <>
-                        <Button onClick={() => logout()} color="inherit">Sign Out</Button>
+                        <Button onClick={() => logout()} color="inherit" data-cy="logout">Sign Out</Button>
                     </>
                     }
                     <Box sx={{mr: -10}}></Box>
