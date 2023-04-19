@@ -45,7 +45,7 @@ export default function Practice() {
         for (let i = 0; i < from_api["tenwords"].length; i++){
             if (text[i] == from_api["tenwords"][i]["foreignword"]){
                 correct = correct + 1;
-                setCorrect(correct + 1);
+                setCorrect(correct);
             } else {
                 wrong.push(i);
                 setIncorrect(wrong);
