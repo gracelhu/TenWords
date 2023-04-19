@@ -47,6 +47,74 @@ var mockWords = []Word{
 	{ID: "10", Word: "life"},
 }
 
+func TestQuiz(t *testing.T) {
+	// Connect to the test database
+	def := "Aayesha"
+	//updated:="testindex2"
+
+	clientOptions := options.Client().ApplyURI("mongodb://localhost:27017")
+	client, err := mongo.Connect(context.Background(), clientOptions)
+	if err != nil {
+		t.Fatal("Failed to connect to database:", err)
+	}
+	defer func() {
+		if err = client.Disconnect(context.Background()); err != nil {
+			t.Fatal("Failed to disconnect from database:", err)
+		}
+	}()
+
+	// Create a new collection for testing
+	testColl := client.Database("testdb").Collection("testcoll4")
+
+	// Insert a test document into the collection
+
+	doc := QuizProgress{
+
+		Username: "Aayesha",
+		Quiz: "1",
+		
+		
+	}
+	_, err = testColl.InsertOne(context.Background(), doc)
+	if err != nil {
+		t.Fatal("Failed to insert test document:", err)
+	}
+
+	// Call the function with the test index
+	//updateWordProgress("testindex2")
+	//def="testindex2"
+	// Check that the index was updated in the database
+	filter := bson.M{"Username": "Aayesha", "Quiz": "1", }
+	update := bson.M{"$set": bson.M{
+		"Username": "Aayesha",
+		"quiz": "1",
+	}}
+
+	_, errp := testColl.UpdateOne(context.Background(), filter, update)
+	if errp != nil {
+		log.Fatal(err)
+	}
+
+	//fmt.Println("Word progress updated to: ", progressIndex)
+	cursor, err := testColl.Find(context.TODO(), bson.D{})
+	if err != nil {
+		panic(err)
+	}
+
+	var results []QuizProgress
+	if err = cursor.All(context.TODO(), &results); err != nil {
+		panic(err)
+	}
+	for _, result := range results {
+		fmt.Printf("%+v\n", result)
+		if result.Username != def {
+
+			t.Fatal("Update failed: username not updated in database")
+		}
+	}
+
+}
+
 func TestUpdateWordProgress(t *testing.T) {
 	// Connect to the test database
 	def := "testindex"
