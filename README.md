@@ -30,3 +30,5 @@ cd into the directory in which you've cloned the repository.
 - Type `npm install` to install dependencies for the frontend project
 - Type  `go build`
 - Type `./introToSWE` to run the backend application
+
+Go to `localhost:3000` to interact with the application.
