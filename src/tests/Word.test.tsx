@@ -28,6 +28,12 @@ test('Change Language Selection Adjusts Subtitle', () => {
     } 
 });
 
+test('Ensure instructions properly display for user', () => {
+  const wordsPage = render(<BrowserRouter><Words /></BrowserRouter>);
+  const instructions = wordsPage.getByTestId('instructions');
+  expect(instructions).toHaveTextContent("Click arrows to toggle between different ten word packages, or use the calendar to select a package from a specific date.");
+});
+
 test('Change Language Selection Changes Words Table Component', () => {
   const wordsPage = render(<BrowserRouter><Words /></BrowserRouter>);
   for (let i = 0; i < supported_languages.length; i++){

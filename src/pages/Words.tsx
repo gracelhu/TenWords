@@ -145,10 +145,15 @@ function Words() {
         );
     }
 
+    let original_date = localStorage.getItem("date");
+    let default_date = new Date().getMonth() + 1 + "-" + new Date().getDate() + "-" + new Date().getFullYear();
+    if (original_date === null){
+        original_date = default_date;
+    }
+
     const changeDate = (e: any) => {
-        let original_date = localStorage.getItem("date");
         if (original_date === null){
-            original_date = "04-15-2023"
+            original_date = default_date;
         }
         const date = (e.$M + 1).toString().padStart(2,'0') + "-" + e.$D.toString().padStart(2,'0') + "-" + e.$y;
         const daysBetween = new Date(date).getDate() - new Date(original_date).getDate() + 1;
@@ -156,7 +161,6 @@ function Words() {
         console.log(date);
         console.log(daysBetween);
         setPacketDate(date);
-        //fetch("/api/words/"+language_code[language as keyof typeof language_code]+"/package/date/"+date)
         fetch("/api/words/"+language_code[language as keyof typeof language_code]+"/package/"+daysBetween)
         .then(res => res.json())
         .then(
@@ -170,25 +174,27 @@ function Words() {
         })
     }
 
+
         return (
             <PageTemplate>
                 <Box textAlign='center'>
-                <h3 data-cy="word_template"></h3>
-                <h3 style={{textAlign: "center", color: "black"}}>Click arrows to toggle between different ten word packages</h3>
-                <LocalizationProvider dateAdapter={AdapterDayjs}>
-                    <DatePicker
-                        label="Select Packet Date"
-                        value={packetDate}
-                        onChange={(e) => changeDate(e)}
-                        renderInput={(props) => (
-                            <TextField {...props} />
-                          )}
-                    />
-                </LocalizationProvider>
-                <br/>
-                <br/>
-                <ArrowCircleLeftIcon style={{transform: "scale(2)", color: "black", marginRight: "32px" }} onClick={previousTenWordPackage}></ArrowCircleLeftIcon>
-                <ArrowCircleRightIcon style={{transform: "scale(2)", color: "black", marginRight: "32px" }} onClick={nextTenWordPackage}></ArrowCircleRightIcon>
+                    <h3 data-cy="word_template"></h3>
+                    <h3 style={{textAlign: "center", color: "black"}} data-testid="instructions">Click arrows to toggle between different ten word packages, or use the calendar to select a package from a specific date.</h3>
+                    <LocalizationProvider dateAdapter={AdapterDayjs}>
+                        <DatePicker
+                            label="Select Packet Date"
+                            value={packetDate}
+                            minDate={default_date}
+                            onChange={(e) => changeDate(e)}
+                            renderInput={(props) => (
+                                <TextField {...props} />
+                            )}
+                        />
+                    </LocalizationProvider>
+                    <br/>
+                    <br/>
+                    <ArrowCircleLeftIcon style={{transform: "scale(2)", color: "black", marginRight: "32px" }} onClick={previousTenWordPackage}></ArrowCircleLeftIcon>
+                    <ArrowCircleRightIcon style={{transform: "scale(2)", color: "black", marginRight: "32px" }} onClick={nextTenWordPackage}></ArrowCircleRightIcon>       
                 </Box>
                 <Box sx={{mt: "30px", ml: "10%", width: "80%"}}>
                     <Paper sx={{p: "20px"}}>
