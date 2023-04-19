@@ -28,6 +28,8 @@ Link to Tests: https://github.com/gracelhu/TenWords/tree/sprint-4/src/tests
 #### Sign-In Component
   - Test that sign-in page elements work
   - Test that sign-up page elements work
+#### Sign-Out Component
+  - Test that signing out redirects to the Words page
 #### Authentication Component (e2e)
   - Test that signing in with a stored username / password logs the user in properly and redirects
   - Test that attempting to sign in with an invalid username / password combination does not log the user in and does not redirect
