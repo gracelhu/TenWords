@@ -141,12 +141,12 @@ function Words() {
 
     let original_date = localStorage.getItem("date");
     let default_date = new Date().getMonth() + 1 + "-" + new Date().getDate() + "-" + new Date().getFullYear();
-    if (original_date === null){
+    if (original_date === null || original_date === undefined){
         original_date = default_date;
     }
 
     const changeDate = (e: any) => {
-        if (original_date === null){
+        if (original_date === null || original_date === undefined){
             original_date = default_date;
         }
         const date = (e.$M + 1).toString().padStart(2,'0') + "-" + e.$D.toString().padStart(2,'0') + "-" + e.$y;
