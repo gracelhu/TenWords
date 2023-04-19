@@ -43,7 +43,6 @@ function Words() {
             (result) => {
                 setItems(result);
                 setLoaded(true);
-                console.log("this is frontend.")
             },
         )
         .catch(error => {
@@ -55,16 +54,13 @@ function Words() {
 
     }, [progressIndex]);
 
-    //for the toggle arrows 
     const nextTenWordPackage = () => {
         if(progressIndex <= 3036)
         {
             setProgressIndex(progressIndex + 10);
-            console.log("clicked right!");
             console.log(packageNumber);
             setPackageNumber(packageNumber + 1);
             console.log(packageNumber);
-            //write code here to make the button momentarily change to gray when its clicked 
         }
     }
 
@@ -72,9 +68,7 @@ function Words() {
         if(progressIndex >= 11)
         {
             setProgressIndex(progressIndex - 10);
-            console.log("clicked left!");
             setPackageNumber(packageNumber - 1);
-            //write code here to make the button momentarily change to gray when its clicked 
         }
     }
     
