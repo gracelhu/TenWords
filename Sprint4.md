@@ -6,7 +6,7 @@ This Sprint, we made significant progress on the application by adding new featu
 
 ## Frontend
 ### Frontend Unit Tests
-Link to Tests: https://github.com/gracelhu/TenWords/tree/sprint-3/src/tests
+Link to Tests: https://github.com/gracelhu/TenWords/tree/sprint-4/src/tests
 #### Words Page Component
   - Tests for Changing Language Selection Adjusts Subtitle: Ensure that changing the selected language updates the language displayed on the page
   - Tests for Changing Language Selection Changes Words Table Component: Ensure that changing the selected language updates the language displayed on the table
