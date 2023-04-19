@@ -79,8 +79,9 @@ type AuthValidation struct {
 	State string `json:"State"`
 }
 type QuizProgress struct {
-	Username string `json:"Username"`
-	Quiz     string `json:"quiz"`
+	Username 		string `json:"Username"`
+	Quiz     		string `json:"quiz"`
+	QuestionCount 	string `json:"questioncount"`
 }
 
 /*
@@ -415,11 +416,19 @@ func storeAuth(auth Auth) string {
 func getquizprogress(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	params := mux.Vars(r)
-	err := beeep.Alert("TenWords", "Great job on finishing the quiz! You are ready to learn ten new words!", "tenwords.png")
+	/*
+	err := beeep.Beep(beeep.DefaultFreq, beeep.DefaultDuration)
 	if err != nil {
 		panic(err)
 	}
-	item := QuizProgress{Username: params["username"], Quiz: params["quiznumber"]}
+	*/
+	err := beeep.Notify("TenWords", "Great job on finishing the quiz! You are ready to learn ten new words!", "tenwords.png")
+	if err != nil {
+		panic(err)
+	}
+	
+	fmt.Printf("Test running quiz progress")
+	item := QuizProgress{Username: params["username"], Quiz: params["quiznumber"], QuestionCount: params["questioncount"]}
 	storeQuiz(item)
 	//storeAuth(item)
 	json.NewEncoder(w).Encode(item)
@@ -534,7 +543,7 @@ func main() {
 	//r.HandleFunc("/api/words/package/auth", getnameandpass).Methods("GET")
 	r.HandleFunc("/auth/{username}/{password}", getnameandpass).Methods("GET")
 
-	r.HandleFunc("/quiz/{username}/{quiznumber}", getquizprogress).Methods("GET")
+	r.HandleFunc("/quiz/{username}/{quiznumber}/{questioncount}", getquizprogress).Methods("GET")
 
 	//r.HandleFunc("/startdate/{username}/{quiznumber}", getstartdate).Methods("GET")
 
