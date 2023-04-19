@@ -1,10 +1,8 @@
-# Sprint 3
-Link to Sprint 3 Branch: [https://github.com/gracelhu/TenWords/blob/sprint-3](https://github.com/gracelhu/TenWords/tree/sprint-3)
+# Sprint 4
+Link to Sprint 4 Branch: [https://github.com/gracelhu/TenWords/blob/sprint-4](https://github.com/gracelhu/TenWords/tree/sprint-4)
 
 ## Overview of Sprint Progress
-This Sprint, one of the core features added was the Practice feature. This feature allows users to practice translating ten word packets from english to the language of their choosing. After typing in corresponding translations for the words, users receive a score on their quiz, and receive feedback on what was answered correctly (displays in green) and incorrectly (displays in red). 
-We also implemented a feature that allows the user to switch between various ten word packets by clicking on left and right arrows. Additionally, 
-the frontend and backend connection was solidified this sprint. An authentication server was made with a route handler and a database which was connected to the frontend which allows users to sign up and sign in by storing their credentials. 
+This Sprint, we made significant progress on the application by adding new features that make the app better! One of the features added to the application is the highlight/underline feature. With this feature, users to clearly see the vocabulary words underlines and bolded in the context of example sentences. A calendar selection feature was also implemented that corresponds to user progress on word packages. This allows users to find word packages generated for them on specific dates.
 
 ## Frontend
 ### Frontend Unit Tests
