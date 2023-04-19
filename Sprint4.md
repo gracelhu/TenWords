@@ -2,7 +2,7 @@
 Link to Sprint 4 Branch: [https://github.com/gracelhu/TenWords/blob/sprint-4](https://github.com/gracelhu/TenWords/tree/sprint-4)
 
 ## Overview of Sprint Progress
-This Sprint, we made significant progress on the application by adding new features that make the app better! One of the features added to the application is the highlight/underline feature. With this feature, users to clearly see the vocabulary words underlines and bolded in the context of example sentences. A calendar selection feature was also implemented that corresponds to user progress on word packages. This allows users to find word packages generated for them on specific dates.
+This Sprint, we made significant progress on the application by adding new features that make the app better! One of the features added to the application is the highlight/underline feature. With this feature, users to clearly see the vocabulary words underlines and bolded in the context of example sentences. A calendar selection feature was also implemented that corresponds to user progress on word packages. This allows users to find word packages generated for them on specific dates. Additionally, now users will only see sign in/sign up options in the navigation menu when they are not currently signed in.
 
 ## Frontend
 ### Frontend Unit Tests
