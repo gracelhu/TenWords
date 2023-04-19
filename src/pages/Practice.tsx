@@ -33,7 +33,7 @@ export default function Practice() {
     );
 
     const trackQuizProgress = async(username : string, quiz : string, questioncount : number) => {
-        console.log("Bla bla ablabla abllabla");
+        alert("Congrats! You successfully completed " + questioncount + " questions!")
 		fetch("http://localhost:3000/quiz/" + username + "/" + quiz + "/" + questioncount);
 	}
 
@@ -51,7 +51,7 @@ export default function Practice() {
                 setIncorrect(wrong);
             }
         }
-        if (correct >= 1) {
+        if (correct >= 8) {
             const getusername = localStorage.getItem("username");
             if (getusername != null) {
                 const upsertusername = JSON.parse(getusername);
