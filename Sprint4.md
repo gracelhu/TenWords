@@ -10,6 +10,7 @@ Link to Tests: https://github.com/gracelhu/TenWords/tree/sprint-4/src/tests
 #### Words Page Component
   - Tests for Changing Language Selection Adjusts Subtitle: Ensure that changing the selected language updates the language displayed on the page
   - Tests for Changing Language Selection Changes Words Table Component: Ensure that changing the selected language updates the language displayed on the table
+  - Tests for Calendar Feature Instructions
 #### Words Table Component
   - Ensure exactly 10 words show up in table
   - Ensure words are in passed in language (Italian)
@@ -17,6 +18,8 @@ Link to Tests: https://github.com/gracelhu/TenWords/tree/sprint-4/src/tests
 #### Practice/Quiz Feature Component
   - Ensure that Quiz feature renders correctly by ensuring that quiz title/heading displays with accurate text reflecting topic of learning for user
   - Ensure that instructions for taking quiz/completing practice are shown to the user and enables them to understand what to do on Quiz page for all language selections
+#### Navigation Menu
+  - Ensure Home and Your Words Tabs correctly display
 
 #### Cypress Unit Tests
 #### Word Table Component
