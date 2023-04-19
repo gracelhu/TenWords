@@ -31,4 +31,4 @@ cd into the directory in which you've cloned the repository.
 - Type  `go build`
 - Type `./introToSWE` to run the backend application
 
-Go to `localhost:3000` to interact with the application.
+Go to `http://localhost:3000` to interact with the application.
