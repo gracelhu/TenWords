@@ -2,6 +2,8 @@
 
 Use the app here! https://tenwords.netlify.app/words
 
+Sprint 4 Branch: https://github.com/gracelhu/TenWords/blob/sprint-4
+
 Project Name: TenWords
 
 Project Description:  TenWords is a language-learning web application that allows users to quickly learn a language with just 10 words a day. After creating an account, users will be able to select a language that would like to learn. The languages included are Spanish, French, Russian, Italian, Japanese, and Chinese. Each day, users will receive a new packet of 10 words for the day. On our website, users will be able to learn the 10 words in the language through flashcards and quizzes. The flashcards will include text to speech options, so users can hear the pronunication of the words.
