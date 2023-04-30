@@ -54,8 +54,9 @@ type VocabWord struct {
 }
 
 type TenWordPackage struct {
-	Tenwords []Word `json:"tenwords"`
-	Date     string `json:"date"` //in this format: 01-02-2006
+	Tenwords   []Word `json:"tenwords"`
+	StartIndex int    `json:"startindex"`
+	Date       string `json:"date"` //in this format: 01-02-2006
 }
 
 // only includes an array of the English words for the ten word package. This is for fast display of the
@@ -79,9 +80,9 @@ type AuthValidation struct {
 	State string `json:"State"`
 }
 type QuizProgress struct {
-	Username 		string `json:"Username"`
-	Quiz     		string `json:"quiz"`
-	QuestionCount 	string `json:"questioncount"`
+	Username      string `json:"Username"`
+	Quiz          string `json:"quiz"`
+	QuestionCount string `json:"questioncount"`
 }
 
 /*
@@ -91,10 +92,9 @@ api called "Free Dictionary API". The struct used to demarshall the api's json r
 "dictionaryapi.go". Additionally, this function will only be returning ENGLISH information. The information
 will be translated to different languages in the route handler functions using the golang google translate api
 */
+func setWordInfo(word *Word) {
 
-func getWordInfo(word string, infoType string) string {
-
-	apiURL := dictionaryapiURL + word
+	apiURL := dictionaryapiURL + word.Word
 
 	resp, err := http.Get(apiURL)
 	if err != nil {
@@ -114,26 +114,20 @@ func getWordInfo(word string, infoType string) string {
 		panic(err)
 	}
 
-	if infoType == "definition" {
-		return val[0].Meanings[0].Definitions[0].Definition
-	}
-	if infoType == "examplesentence" {
-		for i := 0; i < len(val[0].Meanings); i++ {
-			for x := 0; x < len(val[0].Meanings[i].Definitions); x++ {
-				if val[0].Meanings[i].Definitions[x].Example != "" {
-					return val[0].Meanings[i].Definitions[x].Example
-				}
+	word.English_definition = val[0].Meanings[0].Definitions[0].Definition
+	for i := 0; i < len(val[0].Meanings); i++ {
+		for x := 0; x < len(val[0].Meanings[i].Definitions); x++ {
+			if val[0].Meanings[i].Definitions[x].Example != "" {
+				word.Examplesentence_english = val[0].Meanings[i].Definitions[x].Example
 			}
 		}
 	}
-	if infoType == "audiofilelink" {
-		for i := 0; i < len(val[0].Phonetics); i++ {
-			if val[0].Phonetics[i].Audio != "" {
-				return val[0].Phonetics[i].Audio
-			}
+
+	for i := 0; i < len(val[0].Phonetics); i++ {
+		if val[0].Phonetics[i].Audio != "" {
+			word.Audiofilelink = val[0].Phonetics[i].Audio
 		}
 	}
-	return ""
 }
 
 func getTenWordsByID(w http.ResponseWriter, r *http.Request) {
@@ -144,15 +138,14 @@ func getTenWordsByID(w http.ResponseWriter, r *http.Request) {
 	updateWordProgress(params["id"])
 	index, _ := strconv.Atoi(params["id"])
 	//slices are zero indexed- not 1 indexed (starting from 0 not 1)
-	var tenWords = TenWordPackage{allWords[index-1 : index+9], currentTime.Format("01-02-2006")}
-	for i, tenworditem := range tenWords.Tenwords {
+	var tenWords = TenWordPackage{allWords[index-1 : index+9], index, currentTime.Format("01-02-2006")}
+	//I think that if you put a name for the second parameter (ex: tenworditem), it makes a COPY of the object, which is why I don't want to use it
+	for i, _ := range tenWords.Tenwords {
 
 		//Set the English_definition, Examplesentence_english, and Audiofilelink fields by calling
-		//the function getWordInfo
-		tenWords.Tenwords[i].English_definition = getWordInfo(tenWords.Tenwords[i].Word, "definition")
-		tenWords.Tenwords[i].Audiofilelink = getWordInfo(tenWords.Tenwords[i].Word, "audiofilelink")
-		tenWords.Tenwords[i].Examplesentence_english = getWordInfo(tenWords.Tenwords[i].Word, "examplesentence")
-		result, err = t.Translate(tenworditem.Word, "auto", params["languagecode"])
+		//the function setWordInfo
+		setWordInfo(&tenWords.Tenwords[i]) //Passing in a word object by reference
+		result, err = t.Translate(tenWords.Tenwords[i].Word, "auto", params["languagecode"])
 		if err != nil {
 			panic(err)
 		}
@@ -168,17 +161,6 @@ func getTenWordsByID(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(tenWords)
 }
 
-func getTenWordsVocabByID(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
-	params := mux.Vars(r)
-
-	index, _ := strconv.Atoi(params["id"])
-
-	var tenWordsVocab = TenWordVocabPackage{allWords[index : index+10]}
-	json.NewEncoder(w).Encode(tenWordsVocab)
-	json.NewEncoder(w).Encode(&TenWordVocabPackage{})
-}
-
 func getWord(w http.ResponseWriter, r *http.Request, words []Word,
 	trans *translator.Translator) {
 	w.Header().Set("Content-Type", "application/json")
@@ -189,9 +171,8 @@ func getWord(w http.ResponseWriter, r *http.Request, words []Word,
 		if item.ID == params["id"] {
 			transresult, _ := trans.Translate(item.Word, "auto", params["languagecode"])
 			item.Foreignword = transresult.Text
-			item.English_definition = getWordInfo(item.Word, "definition")
-			item.Audiofilelink = getWordInfo(item.Word, "audiofilelink")
-			item.Examplesentence_english = getWordInfo(item.Word, "examplesentence")
+
+			setWordInfo(&item)
 
 			transresult, _ = trans.Translate(item.English_definition, "auto", params["languagecode"])
 			item.Foreign_definition = transresult.Text
@@ -244,11 +225,6 @@ func updateWordProgress(progressIndex string) {
 	col := client.Database("First_Database").Collection("First COllection3")
 	fmt.Println("Collection Type: ", reflect.TypeOf(col))
 
-	//MapDatetoindex[dateP] = ProgressIndexP
-	/*So right now, when we're testing the api, we won't be making api calls on seperate days.
-	Therefore, since there can't be repeat days, the map will only store the first call made that day.
-	To work around this for testing purposes, we'll just store the ProgressIndexP as the key too */
-
 	MapDatetoindex[dateP] = ProgressIndexP
 	fmt.Println("printmap:", MapDatetoindex, "in:", ProgressIndexP)
 	oneDoc := MongoField{
@@ -296,7 +272,7 @@ func updateWordProgress(progressIndex string) {
 		panic(err)
 	}
 	//for _, result := range results {
-		//fmt.Printf("%+v\n", result)
+	//fmt.Printf("%+v\n", result)
 	//}
 	//end retrieve
 }
@@ -346,7 +322,7 @@ func storeAuth(auth Auth) string {
 	update := bson.M{"$set": bson.M{
 		"Username": auth.Username,
 		"Password": auth.Password,
-		"Date": auth.Date,
+		"Date":     auth.Date,
 	}}
 
 	_, errp := col.UpdateOne(context.Background(), filter, update)
@@ -365,16 +341,16 @@ func storeAuth(auth Auth) string {
 		panic(err)
 	}
 	for _, result := range results {
-		fmt.Printf("%+v\n", result.Username);
-		fmt.Printf("%+v\n", result.Password);
-		fmt.Printf("%+v\n", result.Date);
+		fmt.Printf("%+v\n", result.Username)
+		fmt.Printf("%+v\n", result.Password)
+		fmt.Printf("%+v\n", result.Date)
 	}
 	var state string = "register"
 	//var username bool = false
 	for _, result := range results {
 		//encode, _ := json.Marshal(result)
 		if result.Username == auth.Username && result.Password == auth.Password {
-			auth.Date = result.Date;
+			auth.Date = result.Date
 			state = "returning"
 			fmt.Println("Returning user!")
 		} else if result.Username == auth.Username && result.Password != auth.Password {
@@ -388,8 +364,8 @@ func storeAuth(auth Auth) string {
 	//end experiment
 	if state == "register" {
 		result, insertErr := col.InsertOne(ctx, oneDoc)
-		fmt.Printf(results[len(results)-1].Date);
-		auth.Date = results[len(results)-1].Date;
+		fmt.Printf(results[len(results)-1].Date)
+		auth.Date = results[len(results)-1].Date
 		if insertErr != nil {
 			fmt.Println("InsertONE Error:", insertErr)
 			os.Exit(1)
@@ -404,9 +380,7 @@ func storeAuth(auth Auth) string {
 		}
 	}
 
-	
 	//fmt.Println(auth.Date);
-
 
 	return state + "|" + auth.Date
 
@@ -421,10 +395,10 @@ func getquizprogress(w http.ResponseWriter, r *http.Request) {
 		panic(err)
 	}
 	/*
-	err := beeep.Alert("TenWords", "Great job on finishing the quiz! You are ready to learn ten new words!", "")
-	if err != nil {
-		panic(err)
-	}
+		err := beeep.Alert("TenWords", "Great job on finishing the quiz! You are ready to learn ten new words!", "")
+		if err != nil {
+			panic(err)
+		}
 	*/
 	fmt.Printf("Test running quiz progress")
 	item := QuizProgress{Username: params["username"], Quiz: params["quiznumber"], QuestionCount: params["questioncount"]}
@@ -523,12 +497,7 @@ func main() {
 	//Route Handler for fetching 10 word packages in each of the foreign languages by their starting index
 	r.HandleFunc("/api/words/{languagecode}/package/{id}", getTenWordsByID).Methods("GET")
 
-	//Route Handler for fetching 10 word packages (just the english vocab) in each of the foreign languages by their starting index
-	//Why is this route handler not working..???
-	r.HandleFunc("/api/words/package/vocab/{id}", getTenWordsVocabByID).Methods("GET")
-
 	//Route Handler for fetching a single word in each of the foreign languages by their index
-
 	//Need to pass in allWords slice and t translator variable into route handler functions, orelse unit
 	//tests treats those variables as not existing
 	r.HandleFunc("/api/words/{languagecode}/single/{id}", func(w http.ResponseWriter, r *http.Request) {
@@ -547,4 +516,76 @@ func main() {
 	//r.HandleFunc("/startdate/{username}/{quiznumber}", getstartdate).Methods("GET")
 
 	log.Fatal(http.ListenAndServe(":8000", r))
+
+	resp, err := http.Get("/api/words/es/package/1")
+	if err != nil {
+		panic(err)
+	}
+	defer resp.Body.Close()
+
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		panic(err)
+	}
+
+	fmt.Println(string(body))
 }
+
+/*
+
+Scrap code:
+
+		//tenWords.Tenwords[i].English_definition = getWordInfo(tenWords.Tenwords[i].Word, "definition")
+		//tenWords.Tenwords[i].Audiofilelink = getWordInfo(tenWords.Tenwords[i].Word, "audiofilelink")
+		//tenWords.Tenwords[i].Examplesentence_english = getWordInfo(tenWords.Tenwords[i].Word, "examplesentence")
+
+		//item.English_definition = getWordInfo(item.Word, "definition")
+		//item.Audiofilelink = getWordInfo(item.Word, "audiofilelink")
+		//item.Examplesentence_english = getWordInfo(item.Word, "examplesentence")
+
+
+	func getWordInfo(word string, infoType string) string {
+
+	apiURL := dictionaryapiURL + word
+
+	resp, err := http.Get(apiURL)
+	if err != nil {
+		// handle error
+		panic(err)
+	}
+	defer resp.Body.Close()
+
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		// handle error
+		panic(err)
+	}
+
+	var val []Words
+	if err := json.Unmarshal([]byte(body), &val); err != nil {
+		panic(err)
+	}
+
+	if infoType == "definition" {
+		return val[0].Meanings[0].Definitions[0].Definition
+	}
+	if infoType == "examplesentence" {
+		for i := 0; i < len(val[0].Meanings); i++ {
+			for x := 0; x < len(val[0].Meanings[i].Definitions); x++ {
+				if val[0].Meanings[i].Definitions[x].Example != "" {
+					return val[0].Meanings[i].Definitions[x].Example
+				}
+			}
+		}
+	}
+	if infoType == "audiofilelink" {
+		for i := 0; i < len(val[0].Phonetics); i++ {
+			if val[0].Phonetics[i].Audio != "" {
+				return val[0].Phonetics[i].Audio
+			}
+		}
+	}
+	return ""
+}
+
+*/
