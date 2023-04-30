@@ -174,7 +174,6 @@ function Words() {
             <PageTemplate>
                 <Box textAlign='center'>
                     <h3 data-cy="word_template"></h3>
-                    <h3 style={{textAlign: "center", color: "black"}} data-testid="instructions">Click arrows to toggle between different ten word packages, or use the calendar to select a package from a specific date.</h3>
                     <LocalizationProvider dateAdapter={AdapterDayjs}>
                         <DatePicker
                             label="Select Packet Date"
@@ -187,10 +186,6 @@ function Words() {
                             )}
                         />
                     </LocalizationProvider>
-                    <br/>
-                    <br/>
-                    <ArrowCircleLeftIcon style={{transform: "scale(2)", color: "black", marginRight: "32px" }} onClick={previousTenWordPackage}></ArrowCircleLeftIcon>
-                    <ArrowCircleRightIcon style={{transform: "scale(2)", color: "black", marginRight: "32px" }} onClick={nextTenWordPackage}></ArrowCircleRightIcon>       
                 </Box>
                 <Box sx={{mt: "30px", ml: "10%", width: "80%"}}>
                     <Paper sx={{p: "20px"}}>
