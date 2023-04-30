@@ -53,24 +53,6 @@ function Words() {
         setPacketDate(items["date"]);
 
     }, [progressIndex]);
-
-    const nextTenWordPackage = () => {
-        if(progressIndex <= 3036)
-        {
-            setProgressIndex(progressIndex + 10);
-            console.log(packageNumber);
-            setPackageNumber(packageNumber + 1);
-            console.log(packageNumber);
-        }
-    }
-
-    const previousTenWordPackage = () => {
-        if(progressIndex >= 11)
-        {
-            setProgressIndex(progressIndex - 10);
-            setPackageNumber(packageNumber - 1);
-        }
-    }
     
     const languages = [
         "spanish",
