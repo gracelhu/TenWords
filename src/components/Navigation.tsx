@@ -3,23 +3,39 @@ import Toolbar from '@mui/material/Toolbar';
 import AppBar from '@mui/material/AppBar';
 import Button from '@mui/material/Button';
 import Box from '@mui/material/Box';
-import { useNavigate } from 'react-router-dom';
-import NavigationChild from './NavigationChild';
 
 export default function Navigation() {
-
-    const navigate = useNavigate();
 
     const logout = () => {
         localStorage.removeItem("username");
         localStorage.removeItem("password");
         localStorage.removeItem("date");
-        navigate('/words', {});
+        window.location.href = "/words";
         return;
     }
 
     return (
-        <NavigationChild logout={logout}/>
+        <>
+            <AppBar color="secondary" position="static">
+                <Toolbar sx={{ margin: 'auto' }}>
+                    <Button href="/" color="inherit" data-testid="home">Home</Button>
+                    <Box sx={{m: 4}}/>
+                    <Button href="/words" color="inherit" data-testid="your-words">Your Words</Button>
+                    <Box sx={{m: 4}}/>
+                    {localStorage.getItem("date") === null || localStorage.getItem("date") === undefined ?
+                    <>
+                        <Button href="/sign-in" color="inherit">Sign In</Button>
+                        <Box sx={{m: 4}}/>
+                        <Button href="/sign-up" color="inherit">Sign Up</Button>
+                        
+                    </> : <>
+                        <Button onClick={() => logout()} color="inherit" data-cy="logout">Sign Out</Button>
+                    </>
+                    }
+                    <Box sx={{mr: -10}}></Box>
+                </Toolbar>
+            </AppBar>
+        </>
     );
 }
 

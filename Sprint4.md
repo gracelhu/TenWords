@@ -2,7 +2,7 @@
 Link to Sprint 4 Branch: [https://github.com/gracelhu/TenWords/blob/sprint-4](https://github.com/gracelhu/TenWords/tree/sprint-4)
 
 ## Overview of Sprint Progress
-This Sprint, we made significant progress on the application by adding new features that make the app better! One of the features added to the application is the highlight/underline feature. With this feature, users to clearly see the vocabulary words underlines and bolded in the context of example sentences. A calendar selection feature was also implemented that corresponds to user progress on word packages. This allows users to find word packages generated for them on specific dates. Additionally, now users will only see sign in/sign up options in the navigation menu when they are not currently signed in.
+This Sprint, we made significant progress on the application by adding new features that make the app better! One of the features added to the application is the highlight/underline feature. With this feature, users to clearly see the vocabulary words underlines and bolded in the context of example sentences. A calendar selection feature was also implemented that corresponds to user progress on word packages. This allows users to find word packages generated for them on specific dates. Additionally, now users will only see sign in/sign up options in the navigation menu when they are not currently signed in as well as a sign out feature. We also made progress on making the app installable to make it not only accessible on `http://localhost:3000`.
 
 ## Frontend
 ### Frontend Unit Tests
@@ -28,13 +28,15 @@ Link to Tests: https://github.com/gracelhu/TenWords/tree/sprint-4/src/tests
 #### Sign-In Component
   - Test that sign-in page elements work
   - Test that sign-up page elements work
+#### Sign-Out Component
+  - Test that signing out redirects to the Words page
 #### Authentication Component (e2e)
   - Test that signing in with a stored username / password logs the user in properly and redirects
   - Test that attempting to sign in with an invalid username / password combination does not log the user in and does not redirect
 
 ## Backend
 ### Backend Unit Tests
-Link to Tests: https://github.com/gracelhu/TenWords/blob/sprint-3/finaltest_test.go
+Link to Tests: [https://github.com/gracelhu/TenWords/blob/sprint-3/finaltest_test.go](https://github.com/gracelhu/TenWords/blob/sprint-4/finaltest_test.go)
   - func TestUsername: Tests whether username is correctly updated in database.
   - func TestPassword: Tests whether the password is correctly updated in database.
   - func TestWord: Tests Word struct and its json components, checks whether it is compatible with the Database. Test Data was sent to the Test Database and it was retrieved and compared with the original data and the test passes.
