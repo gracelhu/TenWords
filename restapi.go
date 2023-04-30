@@ -59,12 +59,6 @@ type TenWordPackage struct {
 	Date       string `json:"date"` //in this format: 01-02-2006
 }
 
-// only includes an array of the English words for the ten word package. This is for fast display of the
-// "preview" card (react mui card component with packet #, date, and english words on it)
-type TenWordVocabPackage struct {
-	TenwordsVocab []Word `json:"tenwordsvocab"`
-}
-
 // struct made for use in mongodb
 type MongoField struct {
 	ProgressIndex string            `json:"ProgressIndex"`
@@ -137,25 +131,44 @@ func getTenWordsByID(w http.ResponseWriter, r *http.Request) {
 	ProgressIndexP = params["id"]
 	updateWordProgress(params["id"])
 	index, _ := strconv.Atoi(params["id"])
-	//slices are zero indexed- not 1 indexed (starting from 0 not 1)
-	var tenWords = TenWordPackage{allWords[index-1 : index+9], index, currentTime.Format("01-02-2006")}
-	//I think that if you put a name for the second parameter (ex: tenworditem), it makes a COPY of the object, which is why I don't want to use it
-	for i, _ := range tenWords.Tenwords {
 
-		//Set the English_definition, Examplesentence_english, and Audiofilelink fields by calling
-		//the function setWordInfo
-		setWordInfo(&tenWords.Tenwords[i]) //Passing in a word object by reference
-		result, err = t.Translate(tenWords.Tenwords[i].Word, "auto", params["languagecode"])
-		if err != nil {
-			panic(err)
+	/*
+		Check to see if the tenwordpackage already exists in the allPackage object by looping through allPackage
+		to see if a ten word package with params["id"] as its StartIndex exists or not. If yes, just set that object
+		to vartenWords. If not, set all the parameters. This is a form of caching
+	*/
+	var noNeedToSet bool = false
+	var tenWords TenWordPackage
+
+	for i, _ := range allPackages {
+		if allPackages[i].StartIndex == index {
+			tenWords = allPackages[i]
+			noNeedToSet = true
 		}
-		tenWords.Tenwords[i].Foreignword = result.Text
+	}
 
-		result, _ = t.Translate(tenWords.Tenwords[i].English_definition, "auto", params["languagecode"])
-		tenWords.Tenwords[i].Foreign_definition = result.Text
+	if !noNeedToSet {
+		//slices are zero indexed- not 1 indexed (starting from 0 not 1)
+		tenWords = TenWordPackage{allWords[index-1 : index+9], index, currentTime.Format("01-02-2006")}
 
-		result, _ = t.Translate(tenWords.Tenwords[i].Examplesentence_english, "auto", params["languagecode"])
-		tenWords.Tenwords[i].Examplesentence_foreign = result.Text
+		//I think that if you put a name for the second parameter (ex: tenworditem), it makes a COPY of the object, which is why I don't want to use it
+		for i, _ := range tenWords.Tenwords {
+
+			//Set the English_definition, Examplesentence_english, and Audiofilelink fields by calling
+			//the function setWordInfo
+			setWordInfo(&tenWords.Tenwords[i]) //Passing in a word object by reference
+			result, err = t.Translate(tenWords.Tenwords[i].Word, "auto", params["languagecode"])
+			if err != nil {
+				panic(err)
+			}
+			tenWords.Tenwords[i].Foreignword = result.Text
+
+			result, _ = t.Translate(tenWords.Tenwords[i].English_definition, "auto", params["languagecode"])
+			tenWords.Tenwords[i].Foreign_definition = result.Text
+
+			result, _ = t.Translate(tenWords.Tenwords[i].Examplesentence_english, "auto", params["languagecode"])
+			tenWords.Tenwords[i].Examplesentence_foreign = result.Text
+		}
 	}
 	allPackages = append(allPackages, tenWords)
 	json.NewEncoder(w).Encode(tenWords)
