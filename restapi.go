@@ -49,10 +49,6 @@ type Word struct {
 	Audiofilelink           string `json:"audiofilelink"`
 }
 
-type VocabWord struct {
-	Tenwords []Word `json:"tenvocabwords"`
-}
-
 type TenWordPackage struct {
 	Tenwords   []Word `json:"tenwords"`
 	StartIndex int    `json:"startindex"`
@@ -86,6 +82,7 @@ api called "Free Dictionary API". The struct used to demarshall the api's json r
 "dictionaryapi.go". Additionally, this function will only be returning ENGLISH information. The information
 will be translated to different languages in the route handler functions using the golang google translate api
 */
+
 func setWordInfo(word *Word) {
 
 	apiURL := dictionaryapiURL + word.Word
@@ -124,6 +121,66 @@ func setWordInfo(word *Word) {
 	}
 }
 
+func setTenWordsInfo(tenWords *TenWordPackage) {
+
+	//array of all the api calls I want to make
+	var apiURLs []string
+	for i, _ := range tenWords.Tenwords {
+		apiURLs = append(apiURLs, dictionaryapiURL+tenWords.Tenwords[i].Word)
+	}
+
+	// create a channel to store the responses
+	respCh := make(chan string)
+
+	// make GET requests concurrently
+	for _, url := range apiURLs {
+		go func(url string) {
+			resp, err := http.Get(url)
+			if err != nil {
+				fmt.Printf("Error fetching %s: %v\n", url, err)
+				return
+			}
+			defer resp.Body.Close()
+
+			// read the response body
+			body, err := io.ReadAll(resp.Body)
+			if err != nil {
+				fmt.Printf("Error reading response body for %s: %v\n", url, err)
+				return
+			}
+
+			// send the response body through the channel
+			respCh <- string(body)
+		}(url)
+	}
+
+	//Loop through the respChn
+	for i := 0; i <= 9; i++ {
+		resp := <-respCh
+
+		var val []Words
+		if err := json.Unmarshal([]byte(resp), &val); err != nil {
+			panic(err)
+		}
+
+		tenWords.Tenwords[i].English_definition = val[0].Meanings[0].Definitions[0].Definition
+
+		for i := 0; i < len(val[0].Meanings); i++ {
+			for x := 0; x < len(val[0].Meanings[i].Definitions); x++ {
+				if val[0].Meanings[i].Definitions[x].Example != "" {
+					tenWords.Tenwords[i].Examplesentence_english = val[0].Meanings[i].Definitions[x].Example
+				}
+			}
+		}
+
+		for i := 0; i < len(val[0].Phonetics); i++ {
+			if val[0].Phonetics[i].Audio != "" {
+				tenWords.Tenwords[i].Audiofilelink = val[0].Phonetics[i].Audio
+			}
+		}
+	}
+}
+
 func getTenWordsByID(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	params := mux.Vars(r)
@@ -151,12 +208,10 @@ func getTenWordsByID(w http.ResponseWriter, r *http.Request) {
 		//slices are zero indexed- not 1 indexed (starting from 0 not 1)
 		tenWords = TenWordPackage{allWords[index-1 : index+9], index, currentTime.Format("01-02-2006")}
 
+		setTenWordsInfo(&tenWords) //Passing in a word object by reference
+
 		//I think that if you put a name for the second parameter (ex: tenworditem), it makes a COPY of the object, which is why I don't want to use it
 		for i, _ := range tenWords.Tenwords {
-
-			//Set the English_definition, Examplesentence_english, and Audiofilelink fields by calling
-			//the function setWordInfo
-			setWordInfo(&tenWords.Tenwords[i]) //Passing in a word object by reference
 			result, err = t.Translate(tenWords.Tenwords[i].Word, "auto", params["languagecode"])
 			if err != nil {
 				panic(err)
@@ -543,62 +598,3 @@ func main() {
 
 	fmt.Println(string(body))
 }
-
-/*
-
-Scrap code:
-
-		//tenWords.Tenwords[i].English_definition = getWordInfo(tenWords.Tenwords[i].Word, "definition")
-		//tenWords.Tenwords[i].Audiofilelink = getWordInfo(tenWords.Tenwords[i].Word, "audiofilelink")
-		//tenWords.Tenwords[i].Examplesentence_english = getWordInfo(tenWords.Tenwords[i].Word, "examplesentence")
-
-		//item.English_definition = getWordInfo(item.Word, "definition")
-		//item.Audiofilelink = getWordInfo(item.Word, "audiofilelink")
-		//item.Examplesentence_english = getWordInfo(item.Word, "examplesentence")
-
-
-	func getWordInfo(word string, infoType string) string {
-
-	apiURL := dictionaryapiURL + word
-
-	resp, err := http.Get(apiURL)
-	if err != nil {
-		// handle error
-		panic(err)
-	}
-	defer resp.Body.Close()
-
-	body, err := io.ReadAll(resp.Body)
-	if err != nil {
-		// handle error
-		panic(err)
-	}
-
-	var val []Words
-	if err := json.Unmarshal([]byte(body), &val); err != nil {
-		panic(err)
-	}
-
-	if infoType == "definition" {
-		return val[0].Meanings[0].Definitions[0].Definition
-	}
-	if infoType == "examplesentence" {
-		for i := 0; i < len(val[0].Meanings); i++ {
-			for x := 0; x < len(val[0].Meanings[i].Definitions); x++ {
-				if val[0].Meanings[i].Definitions[x].Example != "" {
-					return val[0].Meanings[i].Definitions[x].Example
-				}
-			}
-		}
-	}
-	if infoType == "audiofilelink" {
-		for i := 0; i < len(val[0].Phonetics); i++ {
-			if val[0].Phonetics[i].Audio != "" {
-				return val[0].Phonetics[i].Audio
-			}
-		}
-	}
-	return ""
-}
-
-*/
