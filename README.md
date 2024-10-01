@@ -1,7 +1,5 @@
 # TenWords App
 
-Use the app here! https://tenwords.netlify.app/words
-
 Sprint 4 Branch: https://github.com/gracelhu/TenWords/blob/sprint-4
 
 Project Name: TenWords
