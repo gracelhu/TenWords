@@ -12,7 +12,7 @@ Aayesha Islam
 
 Front-end team:
 Lindsey Seay, 
-Olivia Bronstein
+Olivia 
 
 ## Requirements for Running and Testing Application
 To run the application, clone the repository.
